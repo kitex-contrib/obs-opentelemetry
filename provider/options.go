@@ -135,3 +135,17 @@ func WithEnableMetrics(enableMetrics bool) Option {
 		cfg.enableMetrics = enableMetrics
 	})
 }
+
+// WithTextMapPropagator configures propagation
+func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
+	return option(func(cfg *config) {
+		cfg.textMapPropagator = p
+	})
+}
+
+// WithResourceDetector configures resource detector
+func WithResourceDetector(detector resource.Detector) Option {
+	return option(func(cfg *config) {
+		cfg.resourceDetectors = append(cfg.resourceDetectors, detector)
+	})
+}
