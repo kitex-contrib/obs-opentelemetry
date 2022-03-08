@@ -121,3 +121,10 @@ func WithRecordSourceOperation(recordSourceOperation bool) Option {
 		cfg.recordSourceOperation = recordSourceOperation
 	})
 }
+
+// WithTextMapPropagator configures propagation
+func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
+	return option(func(cfg *config) {
+		cfg.textMapPropagator = p
+	})
+}

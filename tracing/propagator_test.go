@@ -21,7 +21,12 @@ import (
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/contrib/propagators/b3"
+	"go.opentelemetry.io/contrib/propagators/jaeger"
+	"go.opentelemetry.io/contrib/propagators/opencensus"
+	"go.opentelemetry.io/contrib/propagators/ot"
 	"go.opentelemetry.io/otel/baggage"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -69,7 +74,16 @@ func TestExtract(t *testing.T) {
 }
 
 func TestInject(t *testing.T) {
-	cfg := defaultConfig()
+	cfg := newConfig([]Option{WithTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.NewCompositeTextMapPropagator(
+			b3.New(),
+			ot.OT{},
+			jaeger.Jaeger{},
+			opencensus.Binary{},
+			propagation.Baggage{},
+			propagation.TraceContext{},
+		),
+	))})
 
 	ctx := context.Background()
 
@@ -82,6 +96,7 @@ func TestInject(t *testing.T) {
 	})
 
 	ctx = trace.ContextWithSpanContext(ctx, spanContext)
+	md := make(map[string]string)
 
 	type args struct {
 		ctx      context.Context
@@ -97,7 +112,7 @@ func TestInject(t *testing.T) {
 			args: args{
 				ctx:      ctx,
 				c:        cfg,
-				metadata: map[string]string{},
+				metadata: md,
 			},
 		},
 	}
