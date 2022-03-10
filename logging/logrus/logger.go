@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package kitexlogrus
+package logrus
 
 import (
 	"context"
@@ -152,6 +152,8 @@ func (l *Logger) SetLevel(level klog.Level) {
 		lv = logrus.ErrorLevel
 	case klog.LevelFatal:
 		lv = logrus.FatalLevel
+	default:
+		lv = logrus.WarnLevel
 	}
 	l.l.SetLevel(lv)
 }

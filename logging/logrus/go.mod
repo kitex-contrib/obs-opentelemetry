@@ -1,4 +1,4 @@
-module github.com/kitex-contrib/obs-opentelemetry/logging/kitexlogrus
+module github.com/kitex-contrib/obs-opentelemetry/logging/logrus
 
 go 1.16
 

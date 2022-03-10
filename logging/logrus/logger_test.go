@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package kitexlogrus_test
+package logrus_test
 
 import (
 	"context"
@@ -50,10 +50,10 @@ func TestLogger(t *testing.T) {
 	shutdown := stdoutProvider(ctx)
 	defer shutdown()
 
-	logger := kitexlogrus.NewLogger(
-		kitexlogrus.WithTraceHookErrorSpanLevel(logrus.WarnLevel),
-		kitexlogrus.WithTraceHookLevels(logrus.AllLevels),
-		kitexlogrus.WithRecordStackTraceInSpan(true),
+	logger := logrus.NewLogger(
+		logrus.WithTraceHookErrorSpanLevel(logrus.WarnLevel),
+		logrus.WithTraceHookLevels(logrus.AllLevels),
+		logrus.WithRecordStackTraceInSpan(true),
 	)
 
 	logger.Logger().Info("log from origin logrus")
