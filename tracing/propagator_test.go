@@ -127,3 +127,44 @@ func TestInject(t *testing.T) {
 		})
 	}
 }
+
+func TestCGIVariableToHTTPHeaderMetadata(t *testing.T) {
+	type args struct {
+		metadata map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			name: "HTTP2 CGI Variable",
+			args: args{
+				metadata: map[string]string{
+					"OT_BAGGAGE_SERVICE.NAME": "echo-client",
+				},
+			},
+			want: map[string]string{
+				"ot-baggage-service.name": "echo-client",
+			},
+		},
+		{
+			name: "TTHeader",
+			args: args{
+				metadata: map[string]string{
+					"ot-baggage-service.name": "echo-client",
+				},
+			},
+			want: map[string]string{
+				"ot-baggage-service.name": "echo-client",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CGIVariableToHTTPHeaderMetadata(tt.args.metadata); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CGIVariableToHTTPHeaderMetadata() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

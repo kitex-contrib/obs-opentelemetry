@@ -58,7 +58,6 @@ func (s *serverTracer) createMeasures() {
 
 func (s *serverTracer) Start(ctx context.Context) context.Context {
 	tc := &internal.TraceCarrier{}
-	tc.SetMeter(s.config.meter)
 	tc.SetTracer(s.config.tracer)
 
 	return internal.WithTraceCarrier(ctx, tc)
@@ -85,15 +84,14 @@ func (s *serverTracer) Finish(ctx context.Context) {
 
 	// span
 	span := tc.Span()
-	if span == nil {
+	if span == nil || !span.IsRecording() {
 		return
 	}
 
-	// span and metrics common attributes
-
+	// span attributes
 	attrs := []attribute.KeyValue{
 		RPCSystemKitex,
-		RequestProtocolKitex,
+		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 		semconv.RPCMethodKey.String(ri.To().Method()),
 		semconv.RPCServiceKey.String(ri.To().ServiceName()),
 		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),

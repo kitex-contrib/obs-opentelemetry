@@ -70,7 +70,7 @@ func (c *clientTracer) Start(ctx context.Context) context.Context {
 
 func (c *clientTracer) Finish(ctx context.Context) {
 	span := oteltrace.SpanFromContext(ctx)
-	if span == nil {
+	if span == nil || !span.IsRecording() {
 		return
 	}
 
@@ -87,7 +87,7 @@ func (c *clientTracer) Finish(ctx context.Context) {
 
 	attrs := []attribute.KeyValue{
 		RPCSystemKitex,
-		RequestProtocolKitex,
+		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 		semconv.RPCMethodKey.String(ri.To().Method()),
 		semconv.RPCServiceKey.String(ri.To().ServiceName()),
 		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),

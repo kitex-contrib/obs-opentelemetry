@@ -17,7 +17,6 @@ package internal
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/metric"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
@@ -27,10 +26,8 @@ type traceCarrierContextKeyType struct {
 var traceCarrierContextKey traceCarrierContextKeyType
 
 type TraceCarrier struct {
-	meter             metric.Meter
-	tracer            oteltrace.Tracer
-	span              oteltrace.Span
-	spanNameFormatter func(context.Context) string
+	tracer oteltrace.Tracer
+	span   oteltrace.Span
 }
 
 func WithTraceCarrier(ctx context.Context, tc *TraceCarrier) context.Context {
@@ -43,14 +40,6 @@ func TraceCarrierFromContext(ctx context.Context) *TraceCarrier {
 	}
 
 	return nil
-}
-
-func (t *TraceCarrier) Meter() metric.Meter {
-	return t.meter
-}
-
-func (t *TraceCarrier) SetMeter(meter metric.Meter) {
-	t.meter = meter
 }
 
 func (t *TraceCarrier) Tracer() oteltrace.Tracer {
@@ -67,12 +56,4 @@ func (t *TraceCarrier) Span() oteltrace.Span {
 
 func (t *TraceCarrier) SetSpan(span oteltrace.Span) {
 	t.span = span
-}
-
-func (t *TraceCarrier) SpanNameFormatter() func(context.Context) string {
-	return t.spanNameFormatter
-}
-
-func (t *TraceCarrier) SetSpanNameFormatter(spanNameFormatter func(context.Context) string) {
-	t.spanNameFormatter = spanNameFormatter
 }

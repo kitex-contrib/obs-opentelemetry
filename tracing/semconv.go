@@ -58,6 +58,4 @@ const (
 var (
 	// RPCSystemKitex Semantic convention for kitex as the remoting system.
 	RPCSystemKitex = semconv.RPCSystemKey.String("kitex")
-	// RequestProtocolKitex Semantic convention for kitex as the request protocol.
-	RequestProtocolKitex = RequestProtocolKey.String("kitex")
 )

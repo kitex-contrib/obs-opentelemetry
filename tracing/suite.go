@@ -27,38 +27,73 @@ var (
 )
 
 type clientSuite struct {
-	opts []Option
-}
-
-func NewClientSuite(opts ...Option) *clientSuite {
-	return &clientSuite{opts: opts}
+	cOpts []client.Option
 }
 
 func (c *clientSuite) Options() []client.Option {
-	clientOpts, cfg := newClientOption(c.opts...)
-	opts := []client.Option{
+	return c.cOpts
+}
+
+type serverSuite struct {
+	sOpts []server.Option
+}
+
+func (s *serverSuite) Options() []server.Option {
+	return s.sOpts
+}
+
+func NewClientSuite(opts ...Option) *clientSuite {
+	clientOpts, cfg := newClientOption(opts...)
+	cOpts := []client.Option{
 		clientOpts,
 		client.WithMiddleware(ClientMiddleware(cfg)),
 		client.WithTransportProtocol(transport.TTHeader),
 		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 	}
-	return opts
+	return &clientSuite{cOpts}
 }
 
-type serverSuite struct {
-	opts []Option
+func NewFramedClientSuite(opts ...Option) *clientSuite {
+	clientOpts, cfg := newClientOption(opts...)
+	cOpts := []client.Option{
+		clientOpts,
+		client.WithMiddleware(ClientMiddleware(cfg)),
+		client.WithTransportProtocol(transport.Framed),
+		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+	}
+	return &clientSuite{cOpts}
+}
+
+// NewGrpcClientSuite new a grpc client suite
+func NewGrpcClientSuite(opts ...Option) *clientSuite {
+	clientOpts, cfg := newClientOption(opts...)
+	cOpts := []client.Option{
+		clientOpts,
+		client.WithMiddleware(ClientMiddleware(cfg)),
+		client.WithTransportProtocol(transport.GRPC),
+		client.WithMetaHandler(transmeta.ClientHTTP2Handler),
+	}
+	return &clientSuite{cOpts}
 }
 
 func NewServerSuite(opts ...Option) *serverSuite {
-	return &serverSuite{opts: opts}
-}
-
-func (s *serverSuite) Options() []server.Option {
-	serverOpts, cfg := newServerOption(s.opts...)
-	opts := []server.Option{
+	serverOpts, cfg := newServerOption(opts...)
+	sOpts := []server.Option{
 		serverOpts,
 		server.WithMiddleware(ServerMiddleware(cfg)),
 		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),
 	}
-	return opts
+
+	return &serverSuite{sOpts}
+}
+
+func NewGrpcServerSuite(opts ...Option) *serverSuite {
+	serverOpts, cfg := newServerOption(opts...)
+	sOpts := []server.Option{
+		serverOpts,
+		server.WithMiddleware(ServerMiddleware(cfg)),
+		server.WithMetaHandler(transmeta.ServerHTTP2Handler),
+	}
+
+	return &serverSuite{sOpts}
 }

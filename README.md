@@ -9,25 +9,24 @@
 ### Instrumentation
 
 #### Tracing
-- [x] support server and client kitex rpc tracing
+- [x] Support server and client kitex rpc tracing
+- [x] Support automatic transparent transmission of peer service through baggage
 
 #### Metrics
-- [x] support kitex rpc metrics [RED]
-- [x] support go runtime metrics
+- [x] Support kitex rpc metrics [RED]
+- [x] Support peer service dimension in rpc metrics
+- [x] Support go runtime metrics
 
 #### Logging
-- [x] extend kitex logger based on logrus
-- [x] implement tracing auto associated logs
+- [x] Extend kitex logger based on logrus
+- [x] Implement tracing auto associated logs
 
 ## Server usage
 ```go
 import (
     ...
-    kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
     "github.com/kitex-contrib/obs-opentelemetry/provider"
     "github.com/kitex-contrib/obs-opentelemetry/tracing"
-    "go.opentelemetry.io/otel/attribute"
-    semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
 
@@ -53,7 +52,6 @@ func main()  {
 ```go
 import (
     ...
-    kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
     "github.com/kitex-contrib/obs-opentelemetry/provider"
     "github.com/kitex-contrib/obs-opentelemetry/tracing"
 )
@@ -77,6 +75,27 @@ func main(){
 }
 
 ```
+
+
+## Kitex Multi Protocol
+> Kitex supports multiple protocols, we can use different suites to initialize opentelemetry observability suites.
+#### Thrift + TTHeader
+```go
+// server
+server.WithSuite(tracing.NewServerSuite())
+// client
+client.WithSuite(tracing.NewClientSuite())
+```
+
+#### GRPC + HTTP2
+```go
+// server
+server.WithSuite(tracing.NewGrpcServerSuite())
+// client
+client.WithSuite(tracing.NewGrpcClientSuite())
+```
+
+
 
 ## Tracing associated Logs
 

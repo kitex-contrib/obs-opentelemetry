@@ -78,7 +78,10 @@ var (
 
 func extractMetricsAttributesFromSpan(span oteltrace.Span) []attribute.KeyValue {
 	var attrs []attribute.KeyValue
-	readOnlySpan := span.(trace.ReadOnlySpan)
+	readOnlySpan, ok := span.(trace.ReadOnlySpan)
+	if !ok {
+		return attrs
+	}
 
 	// span attributes
 	for _, attr := range readOnlySpan.Attributes() {

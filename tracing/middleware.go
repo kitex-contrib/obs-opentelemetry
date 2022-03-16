@@ -77,8 +77,8 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 			sTracer := tc.Tracer()
 
 			var spanName string
-			if tc.SpanNameFormatter() != nil {
-				spanName = tc.SpanNameFormatter()(ctx)
+			if cfg.spanNameFormatter != nil {
+				spanName = cfg.spanNameFormatter(ctx)
 			}
 
 			ri := rpcinfo.GetRPCInfo(ctx)
