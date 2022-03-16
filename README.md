@@ -2,11 +2,28 @@
 
 [Opentelemetry](https://opentelemetry.io/) for [Kitex](https://github.com/cloudwego/kitex)
 
+## Feature
+#### Provider
+- [x] Out-of-the-box  default opentelemetry provider
+
+### Instrumentation
+
+#### Tracing
+- [x] support server and client kitex rpc tracing
+
+#### Metrics
+- [x] support kitex rpc metrics [RED]
+- [x] support go runtime metrics
+
+#### Logging
+- [x] extend kitex logger based on logrus
+- [x] implement tracing auto associated logs
+
 ## Server usage
 ```go
 import (
     ...
-    "github.com/kitex-contrib/obs-opentelemetry/logging/kitexlogrus"
+    kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
     "github.com/kitex-contrib/obs-opentelemetry/provider"
     "github.com/kitex-contrib/obs-opentelemetry/tracing"
     "go.opentelemetry.io/otel/attribute"
@@ -36,7 +53,7 @@ func main()  {
 ```go
 import (
     ...
-    "github.com/kitex-contrib/obs-opentelemetry/logging/kitexlogrus"
+    kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
     "github.com/kitex-contrib/obs-opentelemetry/provider"
     "github.com/kitex-contrib/obs-opentelemetry/tracing"
 )
