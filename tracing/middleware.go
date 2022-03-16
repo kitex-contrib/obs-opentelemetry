@@ -16,7 +16,6 @@ package tracing
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
@@ -27,10 +26,6 @@ import (
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/sdk/trace"
 	oteltrace "go.opentelemetry.io/otel/trace"
-)
-
-var (
-	errTraceCarrierNotFound = errors.New("tracer not found in context")
 )
 
 // ClientMiddleware inject span context into req meta
