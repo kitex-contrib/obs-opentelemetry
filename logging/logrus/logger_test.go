@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/kitex-contrib/obs-opentelemetry/logging/kitexlogrus"
+	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -50,10 +50,10 @@ func TestLogger(t *testing.T) {
 	shutdown := stdoutProvider(ctx)
 	defer shutdown()
 
-	logger := logrus.NewLogger(
-		logrus.WithTraceHookErrorSpanLevel(logrus.WarnLevel),
-		logrus.WithTraceHookLevels(logrus.AllLevels),
-		logrus.WithRecordStackTraceInSpan(true),
+	logger := kitexlogrus.NewLogger(
+		kitexlogrus.WithTraceHookErrorSpanLevel(logrus.WarnLevel),
+		kitexlogrus.WithTraceHookLevels(logrus.AllLevels),
+		kitexlogrus.WithRecordStackTraceInSpan(true),
 	)
 
 	logger.Logger().Info("log from origin logrus")
