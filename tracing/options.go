@@ -66,6 +66,11 @@ func newConfig(opts []Option) *config {
 		metric.WithInstrumentationVersion(SemVersion()),
 	)
 
+	cfg.tracer = cfg.tracerProvider.Tracer(
+		instrumentationName,
+		trace.WithInstrumentationVersion(SemVersion()),
+	)
+
 	return cfg
 }
 
@@ -80,25 +85,7 @@ func defaultConfig() *config {
 			endpoint := rpcinfo.GetRPCInfo(ctx).To()
 			return endpoint.Method()
 		},
-		tracer: otel.GetTracerProvider().Tracer(
-			instrumentationName,
-			trace.WithInstrumentationVersion(SemVersion()),
-		),
 	}
-}
-
-// WithTracer configures tracer
-func WithTracer(tracer trace.Tracer) Option {
-	return option(func(cfg *config) {
-		cfg.tracer = tracer
-	})
-}
-
-// WithMeter configures meter
-func WithMeter(meter metric.Meter) Option {
-	return option(func(cfg *config) {
-		cfg.meter = meter
-	})
 }
 
 // WithSpanNameFormatter configures span name formatter
