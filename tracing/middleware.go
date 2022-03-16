@@ -21,6 +21,7 @@ import (
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/endpoint"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 	"go.opentelemetry.io/otel/baggage"
@@ -73,7 +74,8 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 		return func(ctx context.Context, req, resp interface{}) (err error) {
 			tc := internal.TraceCarrierFromContext(ctx)
 			if tc == nil {
-				return errTraceCarrierNotFound
+				klog.CtxWarnf(ctx, "TraceCarrier not found in context")
+				return next(ctx, req, resp)
 			}
 
 			// get tracer from carrier
