@@ -25,7 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name:
+      - name: Lint
         run: |
           go vet -stdmethods=false $(go list ./...)
           go install mvdan.cc/gofumpt@v0.2.0
