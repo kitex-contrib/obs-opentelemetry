@@ -20,8 +20,7 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
-type traceCarrierContextKeyType struct {
-}
+type traceCarrierContextKeyType struct{}
 
 var traceCarrierContextKey traceCarrierContextKeyType
 

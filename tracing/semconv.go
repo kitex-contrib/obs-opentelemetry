@@ -47,15 +47,17 @@ const (
 )
 
 const (
-	SourceCanonicalServiceKey = attribute.Key("source_canonical_service")
-	SourceOperationKey        = attribute.Key("source_operation")
+	// SourceOperationKey source operation
+	//
+	// Type: string
+	// Required: Optional
+	// Examples: '/operation1'
+	SourceOperationKey = attribute.Key("source_operation")
 )
 
 const (
 	StatusKey = attribute.Key("status.code")
 )
 
-var (
-	// RPCSystemKitex Semantic convention for kitex as the remoting system.
-	RPCSystemKitex = semconv.RPCSystemKey.String("kitex")
-)
+// RPCSystemKitex Semantic convention for kitex as the remoting system.
+var RPCSystemKitex = semconv.RPCSystemKey.String("kitex")

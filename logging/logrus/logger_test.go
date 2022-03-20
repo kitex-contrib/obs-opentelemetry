@@ -83,5 +83,4 @@ func TestLogger(t *testing.T) {
 	klog.Info("no trace context")
 
 	errSpan.End()
-
 }

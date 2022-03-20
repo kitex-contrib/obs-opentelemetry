@@ -58,7 +58,6 @@ var (
 		PeerDeploymentEnvironmentKey,
 		RequestProtocolKey,
 		SourceOperationKey,
-		SourceCanonicalServiceKey,
 	}
 
 	// MetricResourceAttributes resource attributes
