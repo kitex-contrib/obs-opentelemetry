@@ -40,6 +40,7 @@ func main()  {
     svr := echo.NewServer(
         new(EchoImpl),
         server.WithSuite(tracing.NewServerSuite()),
+        server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "echo"}),
     )
     if err := svr.Run(); err != nil {
         klog.Fatalf("server stopped with error:", err)
@@ -67,6 +68,7 @@ func main(){
     c, err := echo.NewClient(
         "echo",
         client.WithSuite(tracing.NewClientSuite()),
+        client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "echo-client"}),
     )
     if err != nil {
         klog.Fatal(err)
@@ -137,7 +139,7 @@ func (s *EchoImpl) Echo(ctx context.Context, req *api.Request) (resp *api.Respon
 
 ### RPC Metrics
 
-### Kitex Server
+#### Kitex Server
 
 Below is a table of RPC server metric instruments.
 
@@ -145,7 +147,7 @@ Below is a table of RPC server metric instruments.
 |------|------------|------|-------------------------------------------|-------------|--------|-----------|
 | `rpc.server.duration` | Histogram  | milliseconds | `ms` | measures duration of inbound RPC | Recommended | N/A.  While streaming RPCs may record this metric as start-of-batch to end-of-batch, it's hard to interpret in practice. |
 
-### Kitex Client
+#### Kitex Client
 
 Below is a table of RPC client metric instruments.  These apply to traditional
 RPC usage, not streaming RPCs.
@@ -154,5 +156,5 @@ RPC usage, not streaming RPCs.
 |------|------------|------|-------------------------------------------|-------------|--------|-----------|
 | `rpc.client.duration` | Histogram | milliseconds | `ms` | measures duration of outbound RPC | Recommended | N/A.  While streaming RPCs may record this metric as start-of-batch to end-of-batch, it's hard to interpret in practice. |
 
-### Runtime Metrics
+#### Runtime Metrics
 
