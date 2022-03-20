@@ -26,8 +26,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// RecordErrorSpan log error to span
-func RecordErrorSpan(span trace.Span, err error, withStackTrace bool, attributes ...attribute.KeyValue) {
+// recordErrorSpan log error to span
+func recordErrorSpan(span trace.Span, err error, withStackTrace bool, attributes ...attribute.KeyValue) {
 	if span == nil || err == nil {
 		return
 	}

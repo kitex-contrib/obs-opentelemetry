@@ -101,6 +101,9 @@ func extractMetricsAttributesFromSpan(span oteltrace.Span) []attribute.KeyValue 
 		}
 	}
 
+	// status code
+	attrs = append(attrs, StatusKey.String(readOnlySpan.Status().Code.String()))
+
 	return attrs
 }
 

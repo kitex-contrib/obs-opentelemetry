@@ -55,10 +55,7 @@ func ClientMiddleware(cfg *config) endpoint.Middleware {
 				ctx = metainfo.WithValue(ctx, k, v)
 			}
 
-			if err = next(ctx, req, resp); err != nil {
-				RecordErrorSpan(span, err, cfg.withStackTrace)
-			}
-			return err
+			return next(ctx, req, resp)
 		}
 	}
 }
@@ -104,11 +101,7 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 			bags = resetPeerServiceBaggageMember(bags)
 			ctx = baggage.ContextWithBaggage(ctx, bags)
 
-			if err = next(ctx, req, resp); err != nil {
-				RecordErrorSpan(span, err, cfg.withStackTrace)
-			}
-
-			return err
+			return next(ctx, req, resp)
 		}
 	}
 }
