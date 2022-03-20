@@ -73,7 +73,7 @@ func NewOpenTelemetryProvider(opts ...Option) *otelProvider {
 
 	cfg := newConfig(opts)
 
-	if !cfg.enableTracing && cfg.enableMetrics {
+	if !cfg.enableTracing && !cfg.enableMetrics {
 		return nil
 	}
 
