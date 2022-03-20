@@ -34,6 +34,7 @@ func main()  {
     p := provider.NewOpenTelemetryProvider(
         provider.WithServiceName("echo"),
         provider.WithExportEndpoint("localhost:4317"),
+        provider.WithInsecure(),
     )
     defer p.Shutdown(context.Background())
 
@@ -62,6 +63,7 @@ func main(){
     p := provider.NewOpenTelemetryProvider(
         provider.WithServiceName("echo-client"),
         provider.WithExportEndpoint("localhost:4317"),
+        provider.WithInsecure(),
     )
     defer p.Shutdown(context.Background())
     

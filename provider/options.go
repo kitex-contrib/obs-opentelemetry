@@ -68,7 +68,7 @@ func defaultConfig() *config {
 	return &config{
 		enableTracing:  true,
 		enableMetrics:  true,
-		exportInsecure: true,
+		exportInsecure: false,
 		exportEndpoint: "localhost:4317",
 		textMapPropagator: propagation.NewCompositeTextMapPropagator(
 			propagation.NewCompositeTextMapPropagator(
