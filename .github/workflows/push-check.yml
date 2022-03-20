@@ -31,5 +31,5 @@ jobs:
           go install mvdan.cc/gofumpt@v0.2.0
           test -z "$(gofumpt -l -extra .)"
 
-      - name: Unit Testgit
+      - name: Unit Test
         run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
