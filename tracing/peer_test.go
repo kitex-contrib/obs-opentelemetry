@@ -15,56 +15,17 @@
 package tracing
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/baggage"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
-func Test_injectCanonicalServiceToBaggage(t *testing.T) {
-	canonicalServiceBaggage, _ := baggage.Parse("service.name=foo,service.namespace=test-ns,deployment.environment=dev")
+func Test_extractPeerServiceAttributesFromMetaInfo(t *testing.T) {
 	type args struct {
-		attrs []attribute.KeyValue
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    baggage.Baggage
-		wantErr bool
-	}{
-		{
-			name: "inject valid canonical service",
-			args: args{
-				attrs: []attribute.KeyValue{
-					semconv.ServiceNameKey.String("foo"),
-					semconv.ServiceNamespaceKey.String("test-ns"),
-					semconv.DeploymentEnvironmentKey.String("dev"),
-				},
-			},
-			want:    canonicalServiceBaggage,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := injectCanonicalServiceToBaggage(tt.args.attrs)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("injectCanonicalServiceToBaggage() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("injectCanonicalServiceToBaggage() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_peerServiceAttributesFromBaggage(t *testing.T) {
-	canonicalServiceBaggage, _ := baggage.Parse("service.name=foo,service.namespace=test-ns,deployment.environment=dev")
-	type args struct {
-		bags baggage.Baggage
+		md map[string]string
 	}
 	tests := []struct {
 		name string
@@ -72,49 +33,84 @@ func Test_peerServiceAttributesFromBaggage(t *testing.T) {
 		want []attribute.KeyValue
 	}{
 		{
-			name: "peer service attrs from baggage",
+			name: "peer service",
 			args: args{
-				bags: canonicalServiceBaggage,
+				md: map[string]string{
+					string(semconv.ServiceNameKey): "foo",
+				},
+			},
+			want: []attribute.KeyValue{
+				semconv.PeerServiceKey.String("foo"),
+			},
+		},
+		{
+			name: "full peer",
+			args: args{
+				md: map[string]string{
+					string(semconv.ServiceNameKey):           "foo",
+					string(semconv.ServiceNamespaceKey):      "test-ns",
+					string(semconv.DeploymentEnvironmentKey): "test-env",
+				},
 			},
 			want: []attribute.KeyValue{
 				semconv.PeerServiceKey.String("foo"),
 				PeerServiceNamespaceKey.String("test-ns"),
-				PeerDeploymentEnvironmentKey.String("dev"),
+				PeerDeploymentEnvironmentKey.String("test-env"),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := peerServiceAttributesFromBaggage(tt.args.bags); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("peerServiceAttributesFromBaggage() = %v, want %v", got, tt.want)
+			if got := extractPeerServiceAttributesFromMetaInfo(tt.args.md); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("extractPeerServiceAttributesFromMetaInfo() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_resetPeerServiceBaggageMember(t *testing.T) {
-	canonicalServiceBaggage, _ := baggage.Parse("service.name=foo,service.namespace=test-ns,deployment.environment=dev,foo=bar")
-	resetBaggage, _ := baggage.Parse("foo=bar")
+func Test_injectPeerServiceToMetaInfo(t *testing.T) {
 	type args struct {
-		bags baggage.Baggage
+		ctx   context.Context
+		attrs []attribute.KeyValue
 	}
 	tests := []struct {
 		name string
 		args args
-		want baggage.Baggage
+		want map[string]string
 	}{
 		{
-			name: "reset successful",
+			name: "peer service",
 			args: args{
-				bags: canonicalServiceBaggage,
+				ctx: context.Background(),
+				attrs: []attribute.KeyValue{
+					semconv.ServiceNameKey.String("foo"),
+				},
 			},
-			want: resetBaggage,
+			want: map[string]string{
+				"service.name": "foo",
+			},
+		},
+		{
+			name: "full peer",
+			args: args{
+				ctx: context.Background(),
+				attrs: []attribute.KeyValue{
+					semconv.ServiceNameKey.String("foo"),
+					semconv.ServiceNamespaceKey.String("test-ns"),
+					semconv.DeploymentEnvironmentKey.String("test-env"),
+				},
+			},
+			want: map[string]string{
+				string(semconv.ServiceNameKey):           "foo",
+				string(semconv.ServiceNamespaceKey):      "test-ns",
+				string(semconv.DeploymentEnvironmentKey): "test-env",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := resetPeerServiceBaggageMember(tt.args.bags); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("resetPeerServiceBaggageMember() = %v, want %v", got, tt.want)
+			if got := injectPeerServiceToMetaInfo(tt.args.ctx, tt.args.attrs); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("injectPeerServiceToMetaInfo() = %v, want %v", got, tt.want)
 			}
 		})
 	}

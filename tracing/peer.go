@@ -15,57 +15,49 @@
 package tracing
 
 import (
+	"context"
+
+	"github.com/bytedance/gopkg/cloud/metainfo"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/baggage"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
-func resetPeerServiceBaggageMember(bags baggage.Baggage) baggage.Baggage {
-	return bags.DeleteMember(string(semconv.ServiceNameKey)).
-		DeleteMember(string(semconv.ServiceNamespaceKey)).
-		DeleteMember(string(semconv.DeploymentEnvironmentKey))
-}
-
-func peerServiceAttributesFromBaggage(bags baggage.Baggage) []attribute.KeyValue {
-	var attrs []attribute.KeyValue
-
-	serviceName := bags.Member(string(semconv.ServiceNameKey))
-	if serviceName.Value() != "" {
-		attrs = append(attrs, semconv.PeerServiceKey.String(serviceName.Value()))
+func injectPeerServiceToMetaInfo(ctx context.Context, attrs []attribute.KeyValue) map[string]string {
+	md := metainfo.GetAllValues(ctx)
+	if md == nil {
+		md = make(map[string]string)
 	}
-
-	serviceNamespace := bags.Member(string(semconv.ServiceNamespaceKey))
-	if serviceNamespace.Value() != "" {
-		attrs = append(attrs, PeerServiceNamespaceKey.String(serviceNamespace.Value()))
-	}
-
-	deploymentEnvironment := bags.Member(string(semconv.DeploymentEnvironmentKey))
-	if deploymentEnvironment.Value() != "" {
-		attrs = append(attrs, PeerDeploymentEnvironmentKey.String(deploymentEnvironment.Value()))
-	}
-
-	return attrs
-}
-
-func injectCanonicalServiceToBaggage(attrs []attribute.KeyValue) (baggage.Baggage, error) {
-	var bags []baggage.Member
 
 	serviceName, serviceNamespace, deploymentEnv := getServiceFromResourceAttributes(attrs)
 
 	if serviceName != "" {
-		serviceNameM, _ := baggage.NewMember(string(semconv.ServiceNameKey), serviceName)
-		bags = append(bags, serviceNameM)
+		md[string(semconv.ServiceNameKey)] = serviceName
 	}
 
 	if serviceNamespace != "" {
-		serviceNamespaceM, _ := baggage.NewMember(string(semconv.ServiceNamespaceKey), serviceNamespace)
-		bags = append(bags, serviceNamespaceM)
+		md[string(semconv.ServiceNamespaceKey)] = serviceNamespace
 	}
 
 	if deploymentEnv != "" {
-		deploymentEnvM, _ := baggage.NewMember(string(semconv.DeploymentEnvironmentKey), deploymentEnv)
-		bags = append(bags, deploymentEnvM)
+		md[string(semconv.DeploymentEnvironmentKey)] = deploymentEnv
 	}
 
-	return baggage.New(bags...)
+	return md
+}
+
+func extractPeerServiceAttributesFromMetaInfo(md map[string]string) []attribute.KeyValue {
+	var attrs []attribute.KeyValue
+
+	for k, v := range md {
+		switch k {
+		case string(semconv.ServiceNameKey):
+			attrs = append(attrs, semconv.PeerServiceKey.String(v))
+		case string(semconv.ServiceNamespaceKey):
+			attrs = append(attrs, PeerServiceNamespaceKey.String(v))
+		case string(semconv.DeploymentEnvironmentKey):
+			attrs = append(attrs, PeerDeploymentEnvironmentKey.String(v))
+		}
+	}
+
+	return attrs
 }

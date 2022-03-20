@@ -37,20 +37,13 @@ func ClientMiddleware(cfg *config) endpoint.Middleware {
 				return next(ctx, req, resp)
 			}
 
-			// inject client service resource attributes (canonical service) to baggage
 			readOnlySpan := span.(trace.ReadOnlySpan)
-			bags, err := injectCanonicalServiceToBaggage(readOnlySpan.Resource().Attributes())
-			if err != nil {
-				return err
-			}
-			ctx = baggage.ContextWithBaggage(ctx, bags)
 
-			// inject to meta
-			md := metainfo.GetAllValues(ctx)
-			if md == nil {
-				md = make(map[string]string)
-			}
+			// inject client service resource attributes (canonical service) to meta info
+			md := injectPeerServiceToMetaInfo(ctx, readOnlySpan.Resource().Attributes())
+
 			Inject(ctx, cfg, md)
+
 			for k, v := range md {
 				ctx = metainfo.WithValue(ctx, k, v)
 			}
@@ -85,21 +78,18 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 			}
 
 			md := metainfo.GetAllValues(ctx)
+			peerServiceAttributes := extractPeerServiceAttributesFromMetaInfo(md)
+
 			bags, spanCtx := Extract(ctx, cfg, md)
 			ctx = baggage.ContextWithBaggage(ctx, bags)
 
 			ctx, span := sTracer.Start(oteltrace.ContextWithRemoteSpanContext(ctx, spanCtx), spanName, opts...)
 
-			// peer service resource attrs
-			attrs := peerServiceAttributesFromBaggage(bags)
-			span.SetAttributes(attrs...)
+			// peer service attributes
+			span.SetAttributes(peerServiceAttributes...)
 
 			// set span and attrs into tracer carrier for serverTracer finish
 			tc.SetSpan(span)
-
-			// reset service baggage
-			bags = resetPeerServiceBaggageMember(bags)
-			ctx = baggage.ContextWithBaggage(ctx, bags)
 
 			return next(ctx, req, resp)
 		}
