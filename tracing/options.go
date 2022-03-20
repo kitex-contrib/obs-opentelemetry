@@ -17,10 +17,7 @@ package tracing
 import (
 	"context"
 
-	"github.com/cloudwego/kitex/pkg/remote"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
-	"github.com/cloudwego/kitex/pkg/transmeta"
-	"github.com/cloudwego/kitex/transport"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
@@ -55,10 +52,6 @@ type config struct {
 
 	withStackTrace        bool
 	recordSourceOperation bool
-
-	kitexTransportProtocol transport.Protocol
-	kitexClientMetaHandler remote.MetaHandler
-	kitexServerMetaHandler remote.MetaHandler
 }
 
 func newConfig(opts []Option) *config {
@@ -90,9 +83,6 @@ func defaultConfig() *config {
 			endpoint := rpcinfo.GetRPCInfo(ctx).To()
 			return endpoint.Method()
 		},
-		kitexTransportProtocol: transport.Framed,
-		kitexClientMetaHandler: transmeta.ClientTTHeaderHandler,
-		kitexServerMetaHandler: transmeta.ServerTTHeaderHandler,
 	}
 }
 
@@ -121,23 +111,5 @@ func WithRecordSourceOperation(recordSourceOperation bool) Option {
 func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
 	return option(func(cfg *config) {
 		cfg.textMapPropagator = p
-	})
-}
-
-func WithTransportProtocol(tp transport.Protocol) Option {
-	return option(func(cfg *config) {
-		cfg.kitexTransportProtocol = tp
-	})
-}
-
-func WithClientMetaHandler(h remote.MetaHandler) Option {
-	return option(func(cfg *config) {
-		cfg.kitexClientMetaHandler = h
-	})
-}
-
-func WithServerMetaHandler(h remote.MetaHandler) Option {
-	return option(func(cfg *config) {
-		cfg.kitexServerMetaHandler = h
 	})
 }

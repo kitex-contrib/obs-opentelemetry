@@ -23,7 +23,6 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
@@ -108,7 +107,6 @@ func (s *serverTracer) Finish(ctx context.Context) {
 	injectStatsEventsToSpan(span, st)
 
 	if st.Error() != nil {
-		attrs = append(attrs, StatusKey.String(codes.Error.String()))
 		recordErrorSpan(span, st.Error(), s.config.withStackTrace)
 	}
 
