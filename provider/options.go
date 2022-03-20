@@ -41,7 +41,9 @@ type config struct {
 	enableTracing bool
 	enableMetrics bool
 
+	exportInsecure bool
 	exportEndpoint string
+	exportHeaders  map[string]string
 
 	resource          *resource.Resource
 	sdkTracerProvider *sdktrace.TracerProvider
@@ -66,6 +68,7 @@ func defaultConfig() *config {
 	return &config{
 		enableTracing:  true,
 		enableMetrics:  true,
+		exportInsecure: true,
 		exportEndpoint: "localhost:4317",
 		textMapPropagator: propagation.NewCompositeTextMapPropagator(
 			propagation.NewCompositeTextMapPropagator(
@@ -147,5 +150,19 @@ func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
 func WithResourceDetector(detector resource.Detector) Option {
 	return option(func(cfg *config) {
 		cfg.resourceDetectors = append(cfg.resourceDetectors, detector)
+	})
+}
+
+// WithHeaders configures gRPC requests headers for exported telemetry data
+func WithHeaders(headers map[string]string) Option {
+	return option(func(cfg *config) {
+		cfg.exportHeaders = headers
+	})
+}
+
+// WithInsecure disables client transport security for the exporter's gRPC
+func WithInsecure() Option {
+	return option(func(cfg *config) {
+		cfg.exportInsecure = true
 	})
 }

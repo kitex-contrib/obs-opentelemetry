@@ -32,6 +32,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+	"google.golang.org/grpc/encoding/gzip"
 )
 
 type OtelProvider interface {
@@ -86,10 +87,17 @@ func NewOpenTelemetryProvider(opts ...Option) *otelProvider {
 	// Tracing
 	if cfg.enableTracing {
 		// trace client
-		traceClient := otlptracegrpc.NewClient(
-			otlptracegrpc.WithInsecure(),
+		traceClientOpts := []otlptracegrpc.Option{
 			otlptracegrpc.WithEndpoint(cfg.exportEndpoint),
-		)
+			otlptracegrpc.WithHeaders(cfg.exportHeaders),
+			otlptracegrpc.WithCompressor(gzip.Name),
+		}
+
+		if cfg.exportInsecure {
+			traceClientOpts = append(traceClientOpts, otlptracegrpc.WithInsecure())
+		}
+
+		traceClient := otlptracegrpc.NewClient(traceClientOpts...)
 
 		// trace exporter
 		traceExp, err = otlptrace.New(ctx, traceClient)
@@ -119,11 +127,18 @@ func NewOpenTelemetryProvider(opts ...Option) *otelProvider {
 		// prometheus only supports CumulativeTemporalitySelector
 		exportKindSelector := aggregation.CumulativeTemporalitySelector()
 
-		// metrics client
-		metricClient := otlpmetricgrpc.NewClient(
-			otlpmetricgrpc.WithInsecure(),
+		metricsClientOpts := []otlpmetricgrpc.Option{
 			otlpmetricgrpc.WithEndpoint(cfg.exportEndpoint),
-		)
+			otlpmetricgrpc.WithCompressor(gzip.Name),
+			otlpmetricgrpc.WithHeaders(cfg.exportHeaders),
+		}
+
+		if cfg.exportInsecure {
+			metricsClientOpts = append(metricsClientOpts, otlpmetricgrpc.WithInsecure())
+		}
+
+		// metrics client
+		metricClient := otlpmetricgrpc.NewClient(metricsClientOpts...)
 
 		// metrics exporter
 		metricExp, err := otlpmetric.New(ctx, metricClient, otlpmetric.WithMetricAggregationTemporalitySelector(exportKindSelector))
