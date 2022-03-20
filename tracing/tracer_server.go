@@ -109,7 +109,7 @@ func (s *serverTracer) Finish(ctx context.Context) {
 
 	if st.Error() != nil {
 		attrs = append(attrs, StatusKey.String(codes.Error.String()))
-		recordErrorSpan(span, st.Error(), s.config.withStackTrace, attrs...)
+		recordErrorSpan(span, st.Error(), s.config.withStackTrace)
 	}
 
 	span.End(oteltrace.WithTimestamp(getEndTimeOrDefault(ri, time.Now())))

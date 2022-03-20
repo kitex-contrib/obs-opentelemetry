@@ -15,9 +15,15 @@
 package tracing
 
 import (
+	"context"
+	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
@@ -55,6 +61,63 @@ func Test_getServiceFromResourceAttributes(t *testing.T) {
 			}
 			if gotDeploymentEnv != tt.wantDeploymentEnv {
 				t.Errorf("getServiceFromResourceAttributes() gotDeploymentEnv = %v, want %v", gotDeploymentEnv, tt.wantDeploymentEnv)
+			}
+		})
+	}
+}
+
+func Test_recordErrorSpan(t *testing.T) {
+	sr := tracetest.NewSpanRecorder()
+	tp := trace.NewTracerProvider(trace.WithSpanProcessor(sr))
+	defer tp.Shutdown(context.Background())
+
+	type args struct {
+		err            error
+		withStackTrace bool
+		attributes     []attribute.KeyValue
+	}
+	tests := []struct {
+		name                   string
+		args                   args
+		wantEventsLen          int
+		wantEventAttributesLen int
+	}{
+		{
+			name: "empty attributes",
+			args: args{
+				err:            errors.New("mock error"),
+				withStackTrace: true,
+				attributes:     nil,
+			},
+			wantEventsLen:          1,
+			wantEventAttributesLen: 3,
+		},
+		{
+			name: "with attributes",
+			args: args{
+				err:            errors.New("mock error"),
+				withStackTrace: true,
+				attributes: []attribute.KeyValue{
+					RPCSystemKitex,
+				},
+			},
+			wantEventsLen:          1,
+			wantEventAttributesLen: 4,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, testSpan := tp.Tracer("test").Start(context.Background(), "test-span")
+			defer testSpan.End()
+
+			recordErrorSpan(testSpan, tt.args.err, tt.args.withStackTrace, tt.args.attributes...)
+			readOnlySpan := testSpan.(trace.ReadOnlySpan)
+
+			assert.Equal(t, trace.Status{Code: codes.Error, Description: "mock error"}, readOnlySpan.Status())
+			assert.Equal(t, tt.wantEventsLen, len(readOnlySpan.Events()))
+			for _, event := range readOnlySpan.Events() {
+				assert.Equal(t, "exception", event.Name)
+				assert.Equal(t, tt.wantEventAttributesLen, len(event.Attributes))
 			}
 		})
 	}

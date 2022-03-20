@@ -103,7 +103,7 @@ func (c *clientTracer) Finish(ctx context.Context) {
 	injectStatsEventsToSpan(span, st)
 
 	if st.Error() != nil {
-		recordErrorSpan(span, st.Error(), c.config.withStackTrace, attrs...)
+		recordErrorSpan(span, st.Error(), c.config.withStackTrace)
 	}
 
 	span.End(oteltrace.WithTimestamp(getEndTimeOrDefault(ri, time.Now())))
