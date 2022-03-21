@@ -99,9 +99,9 @@ client.WithSuite(tracing.NewClientSuite())
 #### GRPC + HTTP2
 ```go
 // server
-server.WithSuite(tracing.NewGrpcServerSuite())
+server.WithSuite(tracing.NewGRPCServerSuite())
 // client
-client.WithSuite(tracing.NewGrpcClientSuite())
+client.WithSuite(tracing.NewGRPCClientSuite())
 ```
 
 

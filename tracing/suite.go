@@ -64,8 +64,7 @@ func NewFramedClientSuite(opts ...Option) *clientSuite {
 	return &clientSuite{cOpts}
 }
 
-// NewGrpcClientSuite new a grpc client suite
-func NewGrpcClientSuite(opts ...Option) *clientSuite {
+func NewGRPCClientSuite(opts ...Option) *clientSuite {
 	clientOpts, cfg := newClientOption(opts...)
 	cOpts := []client.Option{
 		clientOpts,
@@ -87,7 +86,7 @@ func NewServerSuite(opts ...Option) *serverSuite {
 	return &serverSuite{sOpts}
 }
 
-func NewGrpcServerSuite(opts ...Option) *serverSuite {
+func NewGRPCServerSuite(opts ...Option) *serverSuite {
 	serverOpts, cfg := newServerOption(opts...)
 	sOpts := []server.Option{
 		serverOpts,
