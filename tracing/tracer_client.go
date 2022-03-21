@@ -60,7 +60,7 @@ func (c *clientTracer) Start(ctx context.Context) context.Context {
 
 	ri := rpcinfo.GetRPCInfo(ctx)
 	ctx, _ = c.config.tracer.Start(ctx, spanName,
-		oteltrace.WithTimestamp(getStartTimeOrDefault(ri, time.Now())),
+		oteltrace.WithTimestamp(getStartTimeOrNow(ri)),
 		oteltrace.WithSpanKind(oteltrace.SpanKindClient),
 	)
 
@@ -106,7 +106,7 @@ func (c *clientTracer) Finish(ctx context.Context) {
 		recordErrorSpan(span, st.Error(), c.config.withStackTrace)
 	}
 
-	span.End(oteltrace.WithTimestamp(getEndTimeOrDefault(ri, time.Now())))
+	span.End(oteltrace.WithTimestamp(getEndTimeOrNow(ri)))
 
 	metricsAttributes := extractMetricsAttributesFromSpan(span)
 	c.histogramRecorder[ClientDuration].Record(ctx, elapsedTime, metricsAttributes...)

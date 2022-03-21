@@ -46,18 +46,18 @@ func handleErr(err error) {
 	}
 }
 
-func getStartTimeOrDefault(ri rpcinfo.RPCInfo, defaultTime time.Time) time.Time {
+func getStartTimeOrNow(ri rpcinfo.RPCInfo) time.Time {
 	if event := ri.Stats().GetEvent(stats.RPCStart); event != nil {
 		return event.Time()
 	}
-	return defaultTime
+	return time.Now()
 }
 
-func getEndTimeOrDefault(ri rpcinfo.RPCInfo, defaultTime time.Time) time.Time {
+func getEndTimeOrNow(ri rpcinfo.RPCInfo) time.Time {
 	if event := ri.Stats().GetEvent(stats.RPCFinish); event != nil {
 		return event.Time()
 	}
-	return defaultTime
+	return time.Now()
 }
 
 func getServiceFromResourceAttributes(attrs []attribute.KeyValue) (serviceName string, serviceNamespace string, deploymentEnv string) {

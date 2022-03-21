@@ -16,7 +16,6 @@ package tracing
 
 import (
 	"context"
-	"time"
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/endpoint"
@@ -73,7 +72,7 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 
 			ri := rpcinfo.GetRPCInfo(ctx)
 			opts := []oteltrace.SpanStartOption{
-				oteltrace.WithTimestamp(getStartTimeOrDefault(ri, time.Now())),
+				oteltrace.WithTimestamp(getStartTimeOrNow(ri)),
 				oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 			}
 

@@ -110,7 +110,7 @@ func (s *serverTracer) Finish(ctx context.Context) {
 		recordErrorSpan(span, st.Error(), s.config.withStackTrace)
 	}
 
-	span.End(oteltrace.WithTimestamp(getEndTimeOrDefault(ri, time.Now())))
+	span.End(oteltrace.WithTimestamp(getEndTimeOrNow(ri)))
 
 	metricsAttributes := extractMetricsAttributesFromSpan(span)
 	s.histogramRecorder[ServerDuration].Record(ctx, elapsedTime, metricsAttributes...)
