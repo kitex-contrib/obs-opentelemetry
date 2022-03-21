@@ -74,7 +74,7 @@ func main(){
     c, err := echo.NewClient(
         "echo",
         client.WithSuite(tracing.NewClientSuite()),
-		// Please keep the same as provider.WithServiceName
+        // Please keep the same as provider.WithServiceName
         client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: serviceName}),
     )
     if err != nil {
