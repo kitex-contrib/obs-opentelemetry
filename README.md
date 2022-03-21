@@ -31,8 +31,10 @@ import (
 
 
 func main()  {
+    serviceName := "echo"
+	
     p := provider.NewOpenTelemetryProvider(
-        provider.WithServiceName("echo"),
+        provider.WithServiceName(serviceName),
         provider.WithExportEndpoint("localhost:4317"),
         provider.WithInsecure(),
     )
@@ -41,7 +43,8 @@ func main()  {
     svr := echo.NewServer(
         new(EchoImpl),
         server.WithSuite(tracing.NewServerSuite()),
-        server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "echo"}),
+        // Please keep the same as provider.WithServiceName
+        server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: serviceName}),
     )
     if err := svr.Run(); err != nil {
         klog.Fatalf("server stopped with error:", err)
@@ -59,9 +62,10 @@ import (
 )
 
 func main(){
-
+    serviceName := "echo-client"
+	
     p := provider.NewOpenTelemetryProvider(
-        provider.WithServiceName("echo-client"),
+        provider.WithServiceName(serviceName),
         provider.WithExportEndpoint("localhost:4317"),
         provider.WithInsecure(),
     )
@@ -70,7 +74,8 @@ func main(){
     c, err := echo.NewClient(
         "echo",
         client.WithSuite(tracing.NewClientSuite()),
-        client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "echo-client"}),
+		// Please keep the same as provider.WithServiceName
+        client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: serviceName}),
     )
     if err != nil {
         klog.Fatal(err)
