@@ -13,8 +13,8 @@
 - [x] Support automatic transparent transmission of peer service through baggage
 
 #### Metrics
-- [x] Support kitex rpc metrics [RED]
-- [x] Support peer service dimension in rpc metrics
+- [x] Support kitex rpc metrics [R.E.D]
+- [x] Support service topology map metrics [Service Topology Map]
 - [x] Support go runtime metrics
 
 #### Logging
@@ -185,6 +185,12 @@ distributions of the amount of time each request takes
 eg: p99 Latency
 ```
 histogram_quantile(0.99, sum(rate(rpc_server_duration_bucket{}[5m])) by (le, service_name, rpc_method))
+```
+
+### Service Topology Map
+The `rpc.server.duration` will record the peer service and the current service dimension. Based on this dimension, we can aggregate the service topology map
+```
+sum(rate(rpc_server_duration_count{}[5m])) by (service_name, peer_service)
 ```
 
 ### Runtime Metrics
