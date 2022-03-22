@@ -60,7 +60,7 @@ func getEndTimeOrNow(ri rpcinfo.RPCInfo) time.Time {
 	return time.Now()
 }
 
-func getServiceFromResourceAttributes(attrs []attribute.KeyValue) (serviceName string, serviceNamespace string, deploymentEnv string) {
+func getServiceFromResourceAttributes(attrs []attribute.KeyValue) (serviceName, serviceNamespace, deploymentEnv string) {
 	for _, attr := range attrs {
 		switch attr.Key {
 		case semconv.ServiceNameKey:

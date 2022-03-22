@@ -38,7 +38,7 @@ func (m *metadataProvider) Get(key string) string {
 }
 
 // Set a value to metadata by k/v
-func (m *metadataProvider) Set(key string, value string) {
+func (m *metadataProvider) Set(key, value string) {
 	m.metadata[key] = value
 }
 
