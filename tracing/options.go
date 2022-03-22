@@ -15,9 +15,6 @@
 package tracing
 
 import (
-	"context"
-
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
@@ -48,8 +45,6 @@ type config struct {
 	meterProvider     metric.MeterProvider
 	textMapPropagator propagation.TextMapPropagator
 
-	spanNameFormatter func(ctx context.Context) string
-
 	withStackTrace        bool
 	recordSourceOperation bool
 }
@@ -79,18 +74,7 @@ func defaultConfig() *config {
 		tracerProvider:    otel.GetTracerProvider(),
 		meterProvider:     global.GetMeterProvider(),
 		textMapPropagator: otel.GetTextMapPropagator(),
-		spanNameFormatter: func(ctx context.Context) string {
-			endpoint := rpcinfo.GetRPCInfo(ctx).To()
-			return endpoint.Method()
-		},
 	}
-}
-
-// WithSpanNameFormatter configures span name formatter
-func WithSpanNameFormatter(fn func(ctx context.Context) string) Option {
-	return option(func(cfg *config) {
-		cfg.spanNameFormatter = fn
-	})
 }
 
 // WithStackTrace configures stack trace

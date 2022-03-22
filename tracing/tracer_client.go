@@ -53,13 +53,10 @@ func (c *clientTracer) createMeasures() {
 }
 
 func (c *clientTracer) Start(ctx context.Context) context.Context {
-	var spanName string
-	if c.config.spanNameFormatter != nil {
-		spanName = c.config.spanNameFormatter(ctx)
-	}
-
 	ri := rpcinfo.GetRPCInfo(ctx)
-	ctx, _ = c.config.tracer.Start(ctx, spanName,
+	ctx, _ = c.config.tracer.Start(
+		ctx,
+		spanNaming(ri),
 		oteltrace.WithTimestamp(getStartTimeOrNow(ri)),
 		oteltrace.WithSpanKind(oteltrace.SpanKindClient),
 	)
@@ -86,11 +83,11 @@ func (c *clientTracer) Finish(ctx context.Context) {
 
 	attrs := []attribute.KeyValue{
 		RPCSystemKitex,
-		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 		semconv.RPCMethodKey.String(ri.To().Method()),
 		semconv.RPCServiceKey.String(ri.To().ServiceName()),
 		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),
 		RPCSystemKitexSendSize.Int64(int64(st.SendSize())),
+		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 	}
 
 	// The source operation dimension maybe cause high cardinality issues

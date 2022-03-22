@@ -90,11 +90,11 @@ func (s *serverTracer) Finish(ctx context.Context) {
 	// span attributes
 	attrs := []attribute.KeyValue{
 		RPCSystemKitex,
-		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 		semconv.RPCMethodKey.String(ri.To().Method()),
 		semconv.RPCServiceKey.String(ri.To().ServiceName()),
 		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),
 		RPCSystemKitexSendSize.Int64(int64(st.SendSize())),
+		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 	}
 
 	// The source operation dimension maybe cause high cardinality issues

@@ -65,11 +65,6 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 			// get tracer from carrier
 			sTracer := tc.Tracer()
 
-			var spanName string
-			if cfg.spanNameFormatter != nil {
-				spanName = cfg.spanNameFormatter(ctx)
-			}
-
 			ri := rpcinfo.GetRPCInfo(ctx)
 			opts := []oteltrace.SpanStartOption{
 				oteltrace.WithTimestamp(getStartTimeOrNow(ri)),
@@ -82,7 +77,7 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 			bags, spanCtx := Extract(ctx, cfg, md)
 			ctx = baggage.ContextWithBaggage(ctx, bags)
 
-			ctx, span := sTracer.Start(oteltrace.ContextWithRemoteSpanContext(ctx, spanCtx), spanName, opts...)
+			ctx, span := sTracer.Start(oteltrace.ContextWithRemoteSpanContext(ctx, spanCtx), spanNaming(ri), opts...)
 
 			// peer service attributes
 			span.SetAttributes(peerServiceAttributes...)

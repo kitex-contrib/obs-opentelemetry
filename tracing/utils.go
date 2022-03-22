@@ -26,6 +26,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// Ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/rpc.md#span-name
+// naming rule: $package.$service/$method
+func spanNaming(ri rpcinfo.RPCInfo) string {
+	if ri.Invocation().PackageName() != "" {
+		return ri.Invocation().PackageName() + "." + ri.Invocation().ServiceName() + "/" + ri.Invocation().MethodName()
+	}
+	return ri.Invocation().ServiceName() + "/" + ri.Invocation().MethodName()
+}
+
 // recordErrorSpan log error to span
 func recordErrorSpan(span trace.Span, err error, withStackTrace bool, attributes ...attribute.KeyValue) {
 	if span == nil || err == nil {
