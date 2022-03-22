@@ -106,8 +106,8 @@ func (s *serverTracer) Finish(ctx context.Context) {
 
 	injectStatsEventsToSpan(span, st)
 
-	if st.Error() != nil {
-		recordErrorSpan(span, st.Error(), s.config.withStackTrace)
+	if panicMsg, panicStack, rpcErr := parseRPCError(ri); rpcErr != nil || len(panicMsg) > 0 {
+		recordErrorSpanWithStack(span, rpcErr, panicMsg, panicStack)
 	}
 
 	span.End(oteltrace.WithTimestamp(getEndTimeOrNow(ri)))

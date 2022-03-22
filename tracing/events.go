@@ -37,12 +37,13 @@ var commonEvents = map[string]stats.Event{
 func injectStatsEventsToSpan(span trace.Span, st rpcinfo.RPCStats) {
 	for name, event := range commonEvents {
 		if gotEvent := st.GetEvent(event); gotEvent != nil {
+			attrs := []attribute.KeyValue{attribute.Int("event.status", int(gotEvent.Status()))}
+			if gotEvent.Info() != "" {
+				attrs = append(attrs, attribute.String("event.info", gotEvent.Info()))
+			}
 			span.AddEvent(name,
 				trace.WithTimestamp(gotEvent.Time()),
-				trace.WithAttributes(
-					attribute.String("event.info", gotEvent.Info()),
-					attribute.Int("event.status", int(gotEvent.Status())),
-				),
+				trace.WithAttributes(attrs...),
 			)
 		}
 	}

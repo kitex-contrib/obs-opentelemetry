@@ -15,6 +15,8 @@
 package tracing
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -35,18 +37,41 @@ func spanNaming(ri rpcinfo.RPCInfo) string {
 	return ri.Invocation().ServiceName() + "/" + ri.Invocation().MethodName()
 }
 
-// recordErrorSpan log error to span
-func recordErrorSpan(span trace.Span, err error, withStackTrace bool, attributes ...attribute.KeyValue) {
-	if span == nil || err == nil {
+// recordErrorSpanWithStack record error with stack
+func recordErrorSpanWithStack(span trace.Span, err error, stackMessage, stackTrace string, attributes ...attribute.KeyValue) {
+	if span == nil {
 		return
 	}
+
+	// compatible with the case where error is empty
+	if err == nil {
+		err = errors.New(stackMessage)
+	}
+
+	// stack trace
+	attributes = append(attributes,
+		semconv.ExceptionStacktraceKey.String(stackTrace),
+	)
 
 	span.SetStatus(codes.Error, err.Error())
 	span.RecordError(
 		err,
 		trace.WithAttributes(attributes...),
-		trace.WithStackTrace(withStackTrace),
 	)
+}
+
+func parseRPCError(ri rpcinfo.RPCInfo) (panicMsg, panicStack string, err error) {
+	panicked, panicErr := ri.Stats().Panicked()
+	if err = ri.Stats().Error(); err == nil && !panicked {
+		return
+	}
+	if panicked {
+		panicMsg = fmt.Sprintf("%v", panicErr)
+		if stackErr, ok := panicErr.(interface{ Stack() string }); ok {
+			panicStack = stackErr.Stack()
+		}
+	}
+	return
 }
 
 func handleErr(err error) {

@@ -102,7 +102,7 @@ func Test_recordErrorSpan(t *testing.T) {
 				},
 			},
 			wantEventsLen:          1,
-			wantEventAttributesLen: 4,
+			wantEventAttributesLen: 3,
 		},
 	}
 	for _, tt := range tests {
@@ -110,7 +110,8 @@ func Test_recordErrorSpan(t *testing.T) {
 			_, testSpan := tp.Tracer("test").Start(context.Background(), "test-span")
 			defer testSpan.End()
 
-			recordErrorSpan(testSpan, tt.args.err, tt.args.withStackTrace, tt.args.attributes...)
+			recordErrorSpanWithStack(testSpan, tt.args.err, "mock panic", "mock stack")
+
 			readOnlySpan := testSpan.(trace.ReadOnlySpan)
 
 			assert.Equal(t, trace.Status{Code: codes.Error, Description: "mock error"}, readOnlySpan.Status())
