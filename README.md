@@ -163,5 +163,29 @@ RPC usage, not streaming RPCs.
 |------|------------|------|-------------------------------------------|-------------|--------|-----------|
 | `rpc.client.duration` | Histogram | milliseconds | `ms` | measures duration of outbound RPC | Recommended | N/A.  While streaming RPCs may record this metric as start-of-batch to end-of-batch, it's hard to interpret in practice. |
 
-#### Runtime Metrics
+
+### R.E.D
+The RED Method defines the three key metrics you should measure for every microservice in your architecture. We can calculate RED based on `rpc.server.duration`.
+
+#### Rate
+the number of requests, per second, you services are serving.
+```
+sum(rate(rpc_server_duration_count{}[5m])) by (service_name, rpc_method)
+```
+
+#### Errors
+the number of failed requests per second.
+```
+sum(rate(rpc_server_duration_count{status_code="Error"}[5m])) by (service_name, rpc_method) / sum(rate(rpc_server_duration_count{}[5m])) by (service_name, rpc_method)
+```
+
+#### Duration
+distributions of the amount of time each request takes
+
+eg: p99 Latency
+```
+histogram_quantile(0.99, sum(rate(rpc_server_duration_bucket{}[5m])) by (le, service_name, rpc_method))
+```
+
+### Runtime Metrics
 
