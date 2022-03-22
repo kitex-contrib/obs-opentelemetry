@@ -33,3 +33,6 @@ jobs:
 
       - name: Unit Test
         run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
+
+      - name: Benchmark
+        run: go test -bench=. -benchmem -run=none ./...
