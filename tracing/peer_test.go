@@ -16,9 +16,9 @@ package tracing
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/attribute"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
@@ -28,9 +28,10 @@ func Test_extractPeerServiceAttributesFromMetaInfo(t *testing.T) {
 		md map[string]string
 	}
 	tests := []struct {
-		name string
-		args args
-		want []attribute.KeyValue
+		name                 string
+		args                 args
+		want                 []attribute.KeyValue
+		wantCanonicalService string
 	}{
 		{
 			name: "peer service",
@@ -61,9 +62,8 @@ func Test_extractPeerServiceAttributesFromMetaInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := extractPeerServiceAttributesFromMetaInfo(tt.args.md); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("extractPeerServiceAttributesFromMetaInfo() = %v, want %v", got, tt.want)
-			}
+			got := extractPeerServiceAttributesFromMetaInfo(tt.args.md)
+			assert.ElementsMatch(t, got, tt.want)
 		})
 	}
 }
@@ -109,9 +109,8 @@ func Test_injectPeerServiceToMetaInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := injectPeerServiceToMetaInfo(tt.args.ctx, tt.args.attrs); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("injectPeerServiceToMetaInfo() = %v, want %v", got, tt.want)
-			}
+			got := injectPeerServiceToMetaInfo(tt.args.ctx, tt.args.attrs)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
