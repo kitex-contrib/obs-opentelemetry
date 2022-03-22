@@ -169,12 +169,16 @@ The RED Method defines the three key metrics you should measure for every micros
 
 #### Rate
 the number of requests, per second, you services are serving.
+
+eg: QPS
 ```
 sum(rate(rpc_server_duration_count{}[5m])) by (service_name, rpc_method)
 ```
 
 #### Errors
 the number of failed requests per second.
+
+eg: Error ratio
 ```
 sum(rate(rpc_server_duration_count{status_code="Error"}[5m])) by (service_name, rpc_method) / sum(rate(rpc_server_duration_count{}[5m])) by (service_name, rpc_method)
 ```
@@ -182,7 +186,7 @@ sum(rate(rpc_server_duration_count{status_code="Error"}[5m])) by (service_name, 
 #### Duration
 distributions of the amount of time each request takes
 
-eg: p99 Latency
+eg: P99 Latency
 ```
 histogram_quantile(0.99, sum(rate(rpc_server_duration_bucket{}[5m])) by (le, service_name, rpc_method))
 ```
