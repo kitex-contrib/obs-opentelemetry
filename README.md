@@ -5,6 +5,7 @@
 ## Feature
 #### Provider
 - [x] Out-of-the-box  default opentelemetry provider
+- [x] Support setting via environment variables
 
 ### Instrumentation
 
@@ -84,6 +85,7 @@ func main(){
 }
 
 ```
+
 
 
 ## Kitex Multi Protocol
