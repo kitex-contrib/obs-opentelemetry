@@ -1,4 +1,4 @@
-# opentelemetry
+# opentelemetry (This is a community driven project)
 
 [Opentelemetry](https://opentelemetry.io/) for [Kitex](https://github.com/cloudwego/kitex)
 
@@ -200,4 +200,28 @@ sum(rate(rpc_server_duration_count{}[5m])) by (service_name, peer_service)
 ```
 
 ### Runtime Metrics
+| Name | Instrument | Unit | Unit ([UCUM](README.md#instrument-units)) | Description |
+|------|------------|------|-------------------------------------------|-------------|
+| `runtime.go.cgo.calls` | Sum | - | - | Number of cgo calls made by the current process. |
+| `runtime.go.gc.count` | Sum | - | - | Number of completed garbage collection cycles. |
+| `runtime.go.gc.pause_ns` | Histogram | nanosecond | `ns` | Amount of nanoseconds in GC stop-the-world pauses. |
+| `runtime.go.gc.pause_total_ns` | Histogram | nanosecond | `ns` | Cumulative nanoseconds in GC stop-the-world pauses since the program started. |
+| `runtime.go.goroutines` | Gauge | - | - | measures duration of outbound RPC. | 
+| `runtime.go.lookups` | Sum | - | - | Number of pointer lookups performed by the runtime. |
+| `runtime.go.mem.heap_alloc` | Gauge | bytes | `bytes` | Bytes of allocated heap objects. |
+| `runtime.go.mem.heap_idle` | Gauge | bytes | `bytes` | Bytes in idle (unused) spans. |
+| `runtime.go.mem.heap_inuse` | Gauge | bytes | `bytes` | Bytes in in-use spans. |
+| `runtime.go.mem.heap_objects` | Gauge | - | - | Number of allocated heap objects. |
+| `runtime.go.mem.live_objects` | Gauge | - | - | Number of live objects is the number of cumulative Mallocs - Frees. |
+| `runtime.go.mem.heap_released` | Gauge | bytes | `bytes` | Bytes of idle spans whose physical memory has been returned to the OS. |
+| `runtime.go.mem.heap_sys` | Gauge | bytes | `bytes` | Bytes of idle spans whose physical memory has been returned to the OS. |
+| `runtime.uptime` | Sum | ms | `ms` | Milliseconds since application was initialized. |
+
+
+## Compatibility
+The sdk of OpenTelemetry is fully compatible with 1.X opentelemetry-go. [see](https://github.com/open-telemetry/opentelemetry-go#compatibility)
+
+
+maintained by: [CoderPoet](https://github.com/CoderPoet)
+
 
