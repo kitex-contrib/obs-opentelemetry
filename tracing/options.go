@@ -45,7 +45,6 @@ type config struct {
 	meterProvider     metric.MeterProvider
 	textMapPropagator propagation.TextMapPropagator
 
-	withStackTrace        bool
 	recordSourceOperation bool
 }
 
@@ -75,13 +74,6 @@ func defaultConfig() *config {
 		meterProvider:     global.GetMeterProvider(),
 		textMapPropagator: otel.GetTextMapPropagator(),
 	}
-}
-
-// WithStackTrace configures stack trace
-func WithStackTrace(stackTrace bool) Option {
-	return option(func(cfg *config) {
-		cfg.withStackTrace = stackTrace
-	})
 }
 
 // WithRecordSourceOperation configures record source operation dimension
