@@ -51,12 +51,12 @@ func (m *metadataProvider) Keys() []string {
 	return out
 }
 
-// Inject injects correlation context and span context into the kitex metadata info
+// Inject injects span context into the kitex metadata info
 func Inject(ctx context.Context, c *config, metadata map[string]string) {
 	c.textMapPropagator.Inject(ctx, &metadataProvider{metadata: metadata})
 }
 
-// Extract returns the correlation context and span context
+// Extract returns the baggage and span context
 func Extract(ctx context.Context, c *config, metadata map[string]string) (baggage.Baggage, trace.SpanContext) {
 	ctx = c.textMapPropagator.Extract(ctx, &metadataProvider{metadata: CGIVariableToHTTPHeaderMetadata(metadata)})
 	return baggage.FromContext(ctx), trace.SpanContextFromContext(ctx)
