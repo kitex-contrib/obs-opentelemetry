@@ -229,3 +229,14 @@ The sdk of OpenTelemetry is fully compatible with 1.X opentelemetry-go. [see](ht
 maintained by: [CoderPoet](https://github.com/CoderPoet)
 
 
+## Dependencies
+| **Library/Framework** | **Versions** | **Notes** |
+| --- | --- | --- |
+| go.opentelemetry.io/otel | v1.4.1 | ​<br /> |
+| go.opentelemetry.io/otel/trace | v1.4.1 | ​<br /> |
+| go.opentelemetry.io/otel/metric | v0.27.0 | ​<br /> |
+| go.opentelemetry.io/otel/semconv | v1.7.0 |  |
+| go.opentelemetry.io/contrib/instrumentation/runtime | v0.29.0 |  |
+| kitex | v0.2.0 |  |
+
+
