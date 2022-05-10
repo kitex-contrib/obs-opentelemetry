@@ -11,7 +11,7 @@
 
 #### Tracing
 - [x] Support server and client kitex rpc tracing
-- [x] Support automatic transparent transmission of peer service through baggage
+- [x] Support automatic transparent transmission of peer service through meta info
 
 #### Metrics
 - [x] Support kitex rpc metrics [R.E.D]
@@ -21,6 +21,10 @@
 #### Logging
 - [x] Extend kitex logger based on logrus
 - [x] Implement tracing auto associated logs
+
+## Configuration via environment variables
+- [Exporter](https://opentelemetry.io/docs/reference/specification/protocol/exporter/)
+- [SDK](https://opentelemetry.io/docs/reference/specification/sdk-environment-variables/#general-sdk-configuration)
 
 ## Server usage
 ```go
@@ -152,7 +156,7 @@ func (s *EchoImpl) Echo(ctx context.Context, req *api.Request) (resp *api.Respon
 
 Below is a table of RPC server metric instruments.
 
-| Name | Instrument | Unit | Unit ([UCUM](README.md#instrument-units)) | Description | Status | Streaming |
+| Name | Instrument | Unit | Unit (UCUM) | Description | Status | Streaming |
 |------|------------|------|-------------------------------------------|-------------|--------|-----------|
 | `rpc.server.duration` | Histogram  | milliseconds | `ms` | measures duration of inbound RPC | Recommended | N/A.  While streaming RPCs may record this metric as start-of-batch to end-of-batch, it's hard to interpret in practice. |
 
@@ -161,7 +165,7 @@ Below is a table of RPC server metric instruments.
 Below is a table of RPC client metric instruments.  These apply to traditional
 RPC usage, not streaming RPCs.
 
-| Name | Instrument | Unit | Unit ([UCUM](README.md#instrument-units)) | Description | Status | Streaming |
+| Name | Instrument | Unit | Unit (UCUM) | Description | Status | Streaming |
 |------|------------|------|-------------------------------------------|-------------|--------|-----------|
 | `rpc.client.duration` | Histogram | milliseconds | `ms` | measures duration of outbound RPC | Recommended | N/A.  While streaming RPCs may record this metric as start-of-batch to end-of-batch, it's hard to interpret in practice. |
 
@@ -200,7 +204,7 @@ sum(rate(rpc_server_duration_count{}[5m])) by (service_name, peer_service)
 ```
 
 ### Runtime Metrics
-| Name | Instrument | Unit | Unit ([UCUM](README.md#instrument-units)) | Description |
+| Name | Instrument | Unit | Unit (UCUM)) | Description |
 |------|------------|------|-------------------------------------------|-------------|
 | `runtime.go.cgo.calls` | Sum | - | - | Number of cgo calls made by the current process. |
 | `runtime.go.gc.count` | Sum | - | - | Number of completed garbage collection cycles. |
@@ -223,5 +227,16 @@ The sdk of OpenTelemetry is fully compatible with 1.X opentelemetry-go. [see](ht
 
 
 maintained by: [CoderPoet](https://github.com/CoderPoet)
+
+
+## Dependencies
+| **Library/Framework** | **Versions** | **Notes** |
+| --- | --- | --- |
+| go.opentelemetry.io/otel | v1.4.1 | ​<br /> |
+| go.opentelemetry.io/otel/trace | v1.4.1 | ​<br /> |
+| go.opentelemetry.io/otel/metric | v0.27.0 | ​<br /> |
+| go.opentelemetry.io/otel/semconv | v1.7.0 |  |
+| go.opentelemetry.io/contrib/instrumentation/runtime | v0.29.0 |  |
+| kitex | v0.2.0 |  |
 
 
