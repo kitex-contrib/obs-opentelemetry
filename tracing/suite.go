@@ -42,50 +42,33 @@ func (s *serverSuite) Options() []server.Option {
 	return s.sOpts
 }
 
+// NewClientSuite client suite for otel with http2 and ttheader meta handler
 func NewClientSuite(opts ...Option) *clientSuite {
 	clientOpts, cfg := newClientOption(opts...)
 	cOpts := []client.Option{
 		clientOpts,
 		client.WithMiddleware(ClientMiddleware(cfg)),
 		client.WithTransportProtocol(transport.TTHeader),
-		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
-	}
-	return &clientSuite{cOpts}
-}
-
-func NewFramedClientSuite(opts ...Option) *clientSuite {
-	clientOpts, cfg := newClientOption(opts...)
-	cOpts := []client.Option{
-		clientOpts,
-		client.WithMiddleware(ClientMiddleware(cfg)),
-		client.WithTransportProtocol(transport.Framed),
-		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
-	}
-	return &clientSuite{cOpts}
-}
-
-func NewGRPCClientSuite(opts ...Option) *clientSuite {
-	clientOpts, cfg := newClientOption(opts...)
-	cOpts := []client.Option{
-		clientOpts,
-		client.WithMiddleware(ClientMiddleware(cfg)),
-		client.WithTransportProtocol(transport.GRPC),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler),
+		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 	}
 	return &clientSuite{cOpts}
 }
 
+// NewServerSuite server suite for otel with http2 and ttheader meta handler
 func NewServerSuite(opts ...Option) *serverSuite {
 	serverOpts, cfg := newServerOption(opts...)
 	sOpts := []server.Option{
 		serverOpts,
 		server.WithMiddleware(ServerMiddleware(cfg)),
+		server.WithMetaHandler(transmeta.ServerHTTP2Handler),
 		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),
 	}
 
 	return &serverSuite{sOpts}
 }
 
+// Deprecated: Use NewServerSuite instead.
 func NewGRPCServerSuite(opts ...Option) *serverSuite {
 	serverOpts, cfg := newServerOption(opts...)
 	sOpts := []server.Option{
@@ -95,4 +78,29 @@ func NewGRPCServerSuite(opts ...Option) *serverSuite {
 	}
 
 	return &serverSuite{sOpts}
+}
+
+// Deprecated: Use NewClientSuite instead.
+func NewGRPCClientSuite(opts ...Option) *clientSuite {
+	clientOpts, cfg := newClientOption(opts...)
+	cOpts := []client.Option{
+		clientOpts,
+		client.WithMiddleware(ClientMiddleware(cfg)),
+		client.WithTransportProtocol(transport.GRPC),
+		client.WithMetaHandler(transmeta.ClientHTTP2Handler),
+		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+	}
+	return &clientSuite{cOpts}
+}
+
+// Deprecated: Use NewClientSuite instead.
+func NewFramedClientSuite(opts ...Option) *clientSuite {
+	clientOpts, cfg := newClientOption(opts...)
+	cOpts := []client.Option{
+		clientOpts,
+		client.WithMiddleware(ClientMiddleware(cfg)),
+		client.WithTransportProtocol(transport.Framed),
+		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+	}
+	return &clientSuite{cOpts}
 }
