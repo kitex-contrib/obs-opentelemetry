@@ -90,28 +90,6 @@ func main(){
 
 ```
 
-
-
-## Kitex Multi Protocol
-> Kitex supports multiple protocols, we can use different suites to initialize opentelemetry observability suites.
-#### Thrift + TTHeader
-```go
-// server
-server.WithSuite(tracing.NewServerSuite())
-// client
-client.WithSuite(tracing.NewClientSuite())
-```
-
-#### GRPC + HTTP2
-```go
-// server
-server.WithSuite(tracing.NewGRPCServerSuite())
-// client
-client.WithSuite(tracing.NewGRPCClientSuite())
-```
-
-
-
 ## Tracing associated Logs
 
 #### set logger impl
@@ -206,19 +184,19 @@ sum(rate(rpc_server_duration_count{}[5m])) by (service_name, peer_service)
 ### Runtime Metrics
 | Name | Instrument | Unit | Unit (UCUM)) | Description |
 |------|------------|------|-------------------------------------------|-------------|
-| `runtime.go.cgo.calls` | Sum | - | - | Number of cgo calls made by the current process. |
-| `runtime.go.gc.count` | Sum | - | - | Number of completed garbage collection cycles. |
-| `runtime.go.gc.pause_ns` | Histogram | nanosecond | `ns` | Amount of nanoseconds in GC stop-the-world pauses. |
-| `runtime.go.gc.pause_total_ns` | Histogram | nanosecond | `ns` | Cumulative nanoseconds in GC stop-the-world pauses since the program started. |
-| `runtime.go.goroutines` | Gauge | - | - | measures duration of outbound RPC. | 
-| `runtime.go.lookups` | Sum | - | - | Number of pointer lookups performed by the runtime. |
-| `runtime.go.mem.heap_alloc` | Gauge | bytes | `bytes` | Bytes of allocated heap objects. |
-| `runtime.go.mem.heap_idle` | Gauge | bytes | `bytes` | Bytes in idle (unused) spans. |
-| `runtime.go.mem.heap_inuse` | Gauge | bytes | `bytes` | Bytes in in-use spans. |
-| `runtime.go.mem.heap_objects` | Gauge | - | - | Number of allocated heap objects. |
-| `runtime.go.mem.live_objects` | Gauge | - | - | Number of live objects is the number of cumulative Mallocs - Frees. |
-| `runtime.go.mem.heap_released` | Gauge | bytes | `bytes` | Bytes of idle spans whose physical memory has been returned to the OS. |
-| `runtime.go.mem.heap_sys` | Gauge | bytes | `bytes` | Bytes of idle spans whose physical memory has been returned to the OS. |
+| `process.runtime.go.cgo.calls` | Sum | - | - | Number of cgo calls made by the current process. |
+| `process.runtime.go.gc.count` | Sum | - | - | Number of completed garbage collection cycles. |
+| `process.runtime.go.gc.pause_ns` | Histogram | nanosecond | `ns` | Amount of nanoseconds in GC stop-the-world pauses. |
+| `process.runtime.go.gc.pause_total_ns` | Histogram | nanosecond | `ns` | Cumulative nanoseconds in GC stop-the-world pauses since the program started. |
+| `process.runtime.go.goroutines` | Gauge | - | - | measures duration of outbound RPC. | 
+| `process.runtime.go.lookups` | Sum | - | - | Number of pointer lookups performed by the runtime. |
+| `process.runtime.go.mem.heap_alloc` | Gauge | bytes | `bytes` | Bytes of allocated heap objects. |
+| `process.runtime.go.mem.heap_idle` | Gauge | bytes | `bytes` | Bytes in idle (unused) spans. |
+| `process.runtime.go.mem.heap_inuse` | Gauge | bytes | `bytes` | Bytes in in-use spans. |
+| `process.runtime.go.mem.heap_objects` | Gauge | - | - | Number of allocated heap objects. |
+| `process.runtime.go.mem.live_objects` | Gauge | - | - | Number of live objects is the number of cumulative Mallocs - Frees. |
+| `process.runtime.go.mem.heap_released` | Gauge | bytes | `bytes` | Bytes of idle spans whose physical memory has been returned to the OS. |
+| `process.runtime.go.mem.heap_sys` | Gauge | bytes | `bytes` | Bytes of idle spans whose physical memory has been returned to the OS. |
 | `runtime.uptime` | Sum | ms | `ms` | Milliseconds since application was initialized. |
 
 
