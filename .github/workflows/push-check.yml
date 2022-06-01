@@ -25,9 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: typos-action
-        uses: crate-ci/typos@v1.3.3
-
       - name: Lint
         run: |
           go vet -stdmethods=false $(go list ./...)

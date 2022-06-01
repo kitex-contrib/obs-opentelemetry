@@ -19,7 +19,7 @@ import (
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 )
 
 func injectPeerServiceToMetaInfo(ctx context.Context, attrs []attribute.KeyValue) map[string]string {

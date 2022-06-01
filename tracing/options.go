@@ -71,7 +71,7 @@ func newConfig(opts []Option) *config {
 func defaultConfig() *config {
 	return &config{
 		tracerProvider:    otel.GetTracerProvider(),
-		meterProvider:     global.GetMeterProvider(),
+		meterProvider:     global.MeterProvider(),
 		textMapPropagator: otel.GetTextMapPropagator(),
 	}
 }
