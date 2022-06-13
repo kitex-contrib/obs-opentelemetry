@@ -53,7 +53,7 @@ func TestLogger(t *testing.T) {
 	logger := kitexlogrus.NewLogger(
 		kitexlogrus.WithTraceHookErrorSpanLevel(logrus.WarnLevel),
 		kitexlogrus.WithTraceHookLevels(logrus.AllLevels),
-		kitexlogrus.WithRecordStackTraceInSpan(true),
+		kitexlogrus.WithRecordStackTraceInSpan(),
 	)
 
 	logger.Logger().Info("log from origin logrus")
