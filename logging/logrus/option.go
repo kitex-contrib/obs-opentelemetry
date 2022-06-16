@@ -84,6 +84,6 @@ func WithTraceHookErrorSpanLevel(level logrus.Level) Option {
 
 func WithRecordStackTraceInSpan(recordStackTraceInSpan bool) Option {
 	return option(func(cfg *config) {
-		cfg.traceHookConfig.recordStackTraceInSpan = true
+		cfg.traceHookConfig.recordStackTraceInSpan = recordStackTraceInSpan
 	})
 }
