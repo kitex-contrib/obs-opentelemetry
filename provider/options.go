@@ -16,8 +16,6 @@ package provider
 
 import (
 	"go.opentelemetry.io/contrib/propagators/b3"
-	"go.opentelemetry.io/contrib/propagators/jaeger"
-	"go.opentelemetry.io/contrib/propagators/opencensus"
 	"go.opentelemetry.io/contrib/propagators/ot"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -48,6 +46,8 @@ type config struct {
 	resource          *resource.Resource
 	sdkTracerProvider *sdktrace.TracerProvider
 
+	sampler sdktrace.Sampler
+
 	resourceAttributes []attribute.KeyValue
 	resourceDetectors  []resource.Detector
 
@@ -68,12 +68,11 @@ func defaultConfig() *config {
 	return &config{
 		enableTracing: true,
 		enableMetrics: true,
+		sampler:       sdktrace.AlwaysSample(),
 		textMapPropagator: propagation.NewCompositeTextMapPropagator(
 			propagation.NewCompositeTextMapPropagator(
 				b3.New(),
 				ot.OT{},
-				jaeger.Jaeger{},
-				opencensus.Binary{},
 				propagation.Baggage{},
 				propagation.TraceContext{},
 			),
@@ -162,5 +161,19 @@ func WithHeaders(headers map[string]string) Option {
 func WithInsecure() Option {
 	return option(func(cfg *config) {
 		cfg.exportInsecure = true
+	})
+}
+
+// WithSampler configures sampler
+func WithSampler(sampler sdktrace.Sampler) Option {
+	return option(func(cfg *config) {
+		cfg.sampler = sampler
+	})
+}
+
+// WithSdkTracerProvider configures sdkTracerProvider
+func WithSdkTracerProvider(sdkTracerProvider *sdktrace.TracerProvider) Option {
+	return option(func(cfg *config) {
+		cfg.sdkTracerProvider = sdkTracerProvider
 	})
 }
