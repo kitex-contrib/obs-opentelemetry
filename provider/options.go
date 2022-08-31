@@ -21,7 +21,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 )
 
 // Option opts for opentelemetry tracer provider
@@ -98,6 +98,13 @@ func WithDeploymentEnvironment(env string) Option {
 func WithServiceNamespace(namespace string) Option {
 	return option(func(cfg *config) {
 		cfg.resourceAttributes = append(cfg.resourceAttributes, semconv.ServiceNamespaceKey.String(namespace))
+	})
+}
+
+// WithResourceAttribute configures resource attribute
+func WithResourceAttribute(rAttr attribute.KeyValue) Option {
+	return option(func(cfg *config) {
+		cfg.resourceAttributes = append(cfg.resourceAttributes, rAttr)
 	})
 }
 
