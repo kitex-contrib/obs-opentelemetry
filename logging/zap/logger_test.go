@@ -17,7 +17,6 @@ package zap
 import (
 	"bytes"
 	"context"
-	"go.uber.org/zap/zapcore"
 	"strings"
 	"testing"
 
@@ -27,6 +26,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func stdoutProvider(ctx context.Context) func() {
@@ -79,7 +79,7 @@ func humanEncoderConfig() zapcore.EncoderConfig {
 func TestLogger(t *testing.T) {
 	ctx := context.Background()
 
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 
 	shutdown := stdoutProvider(ctx)
 	defer shutdown()
@@ -123,7 +123,7 @@ func TestLogger(t *testing.T) {
 
 	child.End()
 
-	ctx, errSpan := tracer.Start(ctx, "error")
+	_, errSpan := tracer.Start(ctx, "error")
 
 	klog.Info("no trace context")
 
@@ -132,7 +132,7 @@ func TestLogger(t *testing.T) {
 
 // TestLogLevel test SetLevel
 func TestLogLevel(t *testing.T) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 
 	logger := NewLogger(
 		WithTraceErrorSpanLevel(zap.WarnLevel),
@@ -154,7 +154,7 @@ func TestLogLevel(t *testing.T) {
 
 // TestCoreOption test zapcore config option
 func TestCoreOption(t *testing.T) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 
 	logger := NewLogger(
 		WithCoreEnc(zapcore.NewConsoleEncoder(humanEncoderConfig())),
@@ -178,7 +178,7 @@ func TestCoreOption(t *testing.T) {
 
 // TestCoreOption test zapcore config option
 func TestZapOption(t *testing.T) {
-	var buf = new(bytes.Buffer)
+	buf := new(bytes.Buffer)
 
 	logger := NewLogger(
 		WithZapOptions(zap.AddCaller()),
