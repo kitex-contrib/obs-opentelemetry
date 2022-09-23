@@ -20,7 +20,7 @@ English | [中文](README_CN.md)
 - [x] Support go runtime metrics
 
 #### Logging
-- [x] Extend kitex logger based on logrus
+- [x] Extend kitex logger based on logrus and zap
 - [x] Implement tracing auto associated logs
 
 ## Configuration via environment variables
