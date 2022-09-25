@@ -69,7 +69,7 @@ func Test_getServiceFromResourceAttributes(t *testing.T) {
 func Test_recordErrorSpan(t *testing.T) {
 	sr := tracetest.NewSpanRecorder()
 	tp := trace.NewTracerProvider(trace.WithSpanProcessor(sr))
-	defer tp.Shutdown(context.Background())
+	defer tp.Shutdown(context.Background()) //nolint:errcheck
 
 	type args struct {
 		err            error

@@ -26,7 +26,7 @@
 
 #### 日志
 
-- [x] 在logrus的基础上扩展 kitex 日志工具 
+- [x] 在logrus和zap的基础上扩展 kitex 日志工具 
 - [x] 实现跟踪自动关联日志
 
 
