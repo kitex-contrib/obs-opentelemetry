@@ -1,6 +1,6 @@
 name: Push Check
 
-on: [ push ]
+on: [push]
 
 jobs:
   resolve-modules:
@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Check License Header
-        uses: apache/skywalking-eyes@main
+        uses: apache/skywalking-eyes@da0aa5d51adacfcb7d00cf2749246353a62501e4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
