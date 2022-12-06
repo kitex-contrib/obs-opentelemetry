@@ -25,7 +25,7 @@ import (
 var _ klog.FullLogger = (*Logger)(nil)
 
 type Logger struct {
-	l *logrus.Logger
+	L *logrus.Logger
 }
 
 func NewLogger(opts ...Option) *Logger {
@@ -45,96 +45,96 @@ func NewLogger(opts ...Option) *Logger {
 	}
 
 	return &Logger{
-		l: cfg.logger,
+		L: cfg.logger,
 	}
 }
 
 func (l *Logger) Logger() *logrus.Logger {
-	return l.l
+	return l.L
 }
 
 func (l *Logger) Trace(v ...interface{}) {
-	l.l.Trace(v...)
+	l.L.Trace(v...)
 }
 
 func (l *Logger) Debug(v ...interface{}) {
-	l.l.Debug(v...)
+	l.L.Debug(v...)
 }
 
 func (l *Logger) Info(v ...interface{}) {
-	l.l.Info(v...)
+	l.L.Info(v...)
 }
 
 func (l *Logger) Notice(v ...interface{}) {
-	l.l.Warn(v...)
+	l.L.Warn(v...)
 }
 
 func (l *Logger) Warn(v ...interface{}) {
-	l.l.Warn(v...)
+	l.L.Warn(v...)
 }
 
 func (l *Logger) Error(v ...interface{}) {
-	l.l.Error(v...)
+	l.L.Error(v...)
 }
 
 func (l *Logger) Fatal(v ...interface{}) {
-	l.l.Fatal(v...)
+	l.L.Fatal(v...)
 }
 
 func (l *Logger) Tracef(format string, v ...interface{}) {
-	l.l.Tracef(format, v...)
+	l.L.Tracef(format, v...)
 }
 
 func (l *Logger) Debugf(format string, v ...interface{}) {
-	l.l.Debugf(format, v...)
+	l.L.Debugf(format, v...)
 }
 
 func (l *Logger) Infof(format string, v ...interface{}) {
-	l.l.Infof(format, v...)
+	l.L.Infof(format, v...)
 }
 
 func (l *Logger) Noticef(format string, v ...interface{}) {
-	l.l.Warnf(format, v...)
+	l.L.Warnf(format, v...)
 }
 
 func (l *Logger) Warnf(format string, v ...interface{}) {
-	l.l.Warnf(format, v...)
+	l.L.Warnf(format, v...)
 }
 
 func (l *Logger) Errorf(format string, v ...interface{}) {
-	l.l.Errorf(format, v...)
+	l.L.Errorf(format, v...)
 }
 
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.l.Fatalf(format, v...)
+	l.L.Fatalf(format, v...)
 }
 
 func (l *Logger) CtxTracef(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Tracef(format, v...)
+	l.L.WithContext(ctx).Tracef(format, v...)
 }
 
 func (l *Logger) CtxDebugf(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Debugf(format, v...)
+	l.L.WithContext(ctx).Debugf(format, v...)
 }
 
 func (l *Logger) CtxInfof(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Infof(format, v...)
+	l.L.WithContext(ctx).Infof(format, v...)
 }
 
 func (l *Logger) CtxNoticef(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Warnf(format, v...)
+	l.L.WithContext(ctx).Warnf(format, v...)
 }
 
 func (l *Logger) CtxWarnf(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Warnf(format, v...)
+	l.L.WithContext(ctx).Warnf(format, v...)
 }
 
 func (l *Logger) CtxErrorf(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Errorf(format, v...)
+	l.L.WithContext(ctx).Errorf(format, v...)
 }
 
 func (l *Logger) CtxFatalf(ctx context.Context, format string, v ...interface{}) {
-	l.l.WithContext(ctx).Fatalf(format, v...)
+	l.L.WithContext(ctx).Fatalf(format, v...)
 }
 
 func (l *Logger) SetLevel(level klog.Level) {
@@ -155,9 +155,9 @@ func (l *Logger) SetLevel(level klog.Level) {
 	default:
 		lv = logrus.WarnLevel
 	}
-	l.l.SetLevel(lv)
+	l.L.SetLevel(lv)
 }
 
 func (l *Logger) SetOutput(writer io.Writer) {
-	l.l.SetOutput(writer)
+	l.L.SetOutput(writer)
 }

@@ -43,7 +43,7 @@ var (
 )
 
 type Logger struct {
-	l      *zap.SugaredLogger
+	L      *zap.SugaredLogger
 	config *config
 }
 
@@ -60,7 +60,7 @@ func NewLogger(opts ...Option) *Logger {
 		config.zapOpts...)
 
 	return &Logger{
-		l:      logger.Sugar(),
+		L:      logger.Sugar(),
 		config: config,
 	}
 }
@@ -68,22 +68,22 @@ func NewLogger(opts ...Option) *Logger {
 func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
-		l.l.Debug(kvs...)
+		l.L.Debug(kvs...)
 	case klog.LevelInfo:
-		l.l.Info(kvs...)
+		l.L.Info(kvs...)
 	case klog.LevelNotice, klog.LevelWarn:
-		l.l.Warn(kvs...)
+		l.L.Warn(kvs...)
 	case klog.LevelError:
-		l.l.Error(kvs...)
+		l.L.Error(kvs...)
 	case klog.LevelFatal:
-		l.l.Fatal(kvs...)
+		l.L.Fatal(kvs...)
 	default:
-		l.l.Warn(kvs...)
+		l.L.Warn(kvs...)
 	}
 }
 
 func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
-	logger := l.l.With()
+	logger := l.L.With()
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
 		logger.Debugf(format, kvs...)
@@ -104,7 +104,7 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 	var zlevel zapcore.Level
 	span := trace.SpanFromContext(ctx)
 
-	sl := l.l.With(
+	sl := l.L.With(
 		traceIDKey, span.SpanContext().TraceID(), spanIDKey, span.SpanContext().SpanID(), traceFlagsKey, span.SpanContext().TraceFlags())
 	switch level {
 	case klog.LevelDebug, klog.LevelTrace:
@@ -256,9 +256,9 @@ func (l *Logger) SetOutput(writer io.Writer) {
 		l.config.zapOpts...,
 	).Sugar()
 	l.config.coreConfig.ws = ws
-	l.l = log
+	l.L = log
 }
 
 func (l *Logger) Sync() {
-	_ = l.l.Sync()
+	_ = l.L.Sync()
 }
