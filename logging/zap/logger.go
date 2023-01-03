@@ -17,6 +17,7 @@ package zap
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -43,7 +44,8 @@ var (
 )
 
 type Logger struct {
-	l      *zap.SugaredLogger
+	*zap.SugaredLogger
+	l      *zap.Logger
 	config *config
 }
 
@@ -60,30 +62,32 @@ func NewLogger(opts ...Option) *Logger {
 		config.zapOpts...)
 
 	return &Logger{
-		l:      logger.Sugar(),
-		config: config,
+		SugaredLogger: logger.Sugar(),
+		l:             logger,
+		config:        config,
 	}
 }
 
 func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
+	logger := l.With()
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
-		l.l.Debug(kvs...)
+		logger.Debug(kvs...)
 	case klog.LevelInfo:
-		l.l.Info(kvs...)
+		logger.Info(kvs...)
 	case klog.LevelNotice, klog.LevelWarn:
-		l.l.Warn(kvs...)
+		logger.Warn(kvs...)
 	case klog.LevelError:
-		l.l.Error(kvs...)
+		logger.Error(kvs...)
 	case klog.LevelFatal:
-		l.l.Fatal(kvs...)
+		logger.Fatal(kvs...)
 	default:
-		l.l.Warn(kvs...)
+		logger.Warn(kvs...)
 	}
 }
 
 func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
-	logger := l.l.With()
+	logger := l.With()
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
 		logger.Debugf(format, kvs...)
@@ -102,10 +106,16 @@ func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
 
 func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, kvs ...interface{}) {
 	var zlevel zapcore.Level
-	span := trace.SpanFromContext(ctx)
 
-	sl := l.l.With(
-		traceIDKey, span.SpanContext().TraceID(), spanIDKey, span.SpanContext().SpanID(), traceFlagsKey, span.SpanContext().TraceFlags())
+	var fields []zap.Field
+	span := trace.SpanFromContext(ctx)
+	if span.IsRecording() {
+		fields = append(fields, zap.Any(traceIDKey, span.SpanContext().TraceID()))
+		fields = append(fields, zap.Any(spanIDKey, span.SpanContext().SpanID()))
+		fields = append(fields, zap.Any(traceFlagsKey, span.SpanContext().TraceFlags()))
+	}
+
+	sl := l.With(fields)
 	switch level {
 	case klog.LevelDebug, klog.LevelTrace:
 		zlevel = zap.DebugLevel
@@ -127,12 +137,12 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 		sl.Warnf(format, kvs...)
 	}
 
-	msg := getMessage(format, kvs)
-
 	if !span.IsRecording() {
-		l.Logf(level, format, kvs...)
 		return
 	}
+
+	msg := getMessage(format, kvs)
+
 	attrs := []attribute.KeyValue{
 		logMessageKey.String(msg),
 		logSeverityTextKey.String(OtelSeverityText(zlevel)),
@@ -254,11 +264,69 @@ func (l *Logger) SetOutput(writer io.Writer) {
 	log := zap.New(
 		zapcore.NewCore(l.config.coreConfig.enc, ws, l.config.coreConfig.lvl),
 		l.config.zapOpts...,
-	).Sugar()
+	)
 	l.config.coreConfig.ws = ws
 	l.l = log
+	l.SugaredLogger = log.Sugar()
 }
 
-func (l *Logger) Sync() {
-	_ = l.l.Sync()
+func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, kvs ...interface{}) {
+	if len(kvs) == 0 || len(kvs)%2 != 0 {
+		l.Warn(fmt.Sprint("Keyvalues must appear in pairs:", kvs))
+		return
+	}
+
+	var fields []zap.Field
+	for i := 0; i < len(kvs); i += 2 {
+		fields = append(fields, zap.Any(fmt.Sprint(kvs[i]), kvs[i+1]))
+	}
+
+	span := trace.SpanFromContext(ctx)
+	if span.IsRecording() {
+		fields = append(fields, zap.Any(traceIDKey, span.SpanContext().TraceID()))
+		fields = append(fields, zap.Any(spanIDKey, span.SpanContext().SpanID()))
+		fields = append(fields, zap.Any(traceFlagsKey, span.SpanContext().TraceFlags()))
+	}
+
+	var zlevel zapcore.Level
+	zl := l.l.With()
+	switch level {
+	case klog.LevelDebug, klog.LevelTrace:
+		zlevel = zap.DebugLevel
+		zl.Debug(format, fields...)
+	case klog.LevelInfo:
+		zlevel = zap.InfoLevel
+		zl.Info(format, fields...)
+	case klog.LevelNotice, klog.LevelWarn:
+		zlevel = zap.WarnLevel
+		zl.Warn(format, fields...)
+	case klog.LevelError:
+		zlevel = zap.ErrorLevel
+		zl.Error(format, fields...)
+	case klog.LevelFatal:
+		zlevel = zap.FatalLevel
+		zl.Fatal(format, fields...)
+	default:
+		zlevel = zap.WarnLevel
+		zl.Warn(format, fields...)
+	}
+
+	if !span.IsRecording() {
+		return
+	}
+
+	msg := getMessage(format, kvs)
+	attrs := []attribute.KeyValue{
+		logMessageKey.String(msg),
+		logSeverityTextKey.String(OtelSeverityText(zlevel)),
+	}
+
+	//notice: AddEvent,SetStatus,RecordError all have check span.IsRecording
+	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
+
+	// set span status
+	if zlevel <= l.config.traceConfig.errorSpanLevel {
+		span.SetStatus(codes.Error, msg)
+		span.RecordError(errors.New(msg), trace.WithStackTrace(l.config.traceConfig.recordStackTraceInSpan))
+	}
 }

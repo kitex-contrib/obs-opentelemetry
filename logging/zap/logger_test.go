@@ -194,3 +194,39 @@ func TestZapOption(t *testing.T) {
 	// test caller in log result
 	assert.True(t, strings.Contains(buf.String(), "caller"))
 }
+
+// TestCtxLogger test kv logger work with ctx
+func TestCtxKVLogger(t *testing.T) {
+	ctx := context.Background()
+
+	buf := new(bytes.Buffer)
+
+	shutdown := stdoutProvider(ctx)
+	defer shutdown()
+
+	logger := NewLogger(
+		WithTraceErrorSpanLevel(zap.WarnLevel),
+		WithRecordStackTraceInSpan(true),
+	)
+	defer logger.Sync()
+
+	klog.SetLogger(logger)
+	klog.SetOutput(buf)
+	klog.SetLevel(klog.LevelDebug)
+
+	defer buf.Reset()
+	for _, level := range []klog.Level{
+		klog.LevelTrace,
+		klog.LevelDebug,
+		klog.LevelInfo,
+		klog.LevelNotice,
+		klog.LevelWarn,
+		klog.LevelError,
+		//klog.LevelFatal,
+	} {
+		logger.CtxKVLog(context.Background(), level, "log from origin zap", "k1", "v1")
+		assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
+		assert.True(t, strings.Contains(buf.String(), "k1"))
+		assert.True(t, strings.Contains(buf.String(), "v1"))
+	}
+}
