@@ -214,7 +214,23 @@ func TestCtxKVLogger(t *testing.T) {
 	klog.SetOutput(buf)
 	klog.SetLevel(klog.LevelTrace)
 
-	defer buf.Reset()
+	for _, level := range []klog.Level{
+		klog.LevelTrace,
+		klog.LevelDebug,
+		klog.LevelInfo,
+		klog.LevelNotice,
+		klog.LevelWarn,
+		klog.LevelError,
+		//klog.LevelFatal,
+	} {
+		logger.CtxLogf(level, context.Background(), "log from origin zap %s=%s", "k1", "v1")
+		println(buf.String())
+		assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
+		assert.True(t, strings.Contains(buf.String(), "k1"))
+		assert.True(t, strings.Contains(buf.String(), "v1"))
+		buf.Reset()
+	}
+
 	for _, level := range []klog.Level{
 		klog.LevelTrace,
 		klog.LevelDebug,
@@ -225,8 +241,10 @@ func TestCtxKVLogger(t *testing.T) {
 		//klog.LevelFatal,
 	} {
 		logger.CtxKVLog(context.Background(), level, "log from origin zap", "k1", "v1")
+		println(buf.String())
 		assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
 		assert.True(t, strings.Contains(buf.String(), "k1"))
 		assert.True(t, strings.Contains(buf.String(), "v1"))
+		buf.Reset()
 	}
 }

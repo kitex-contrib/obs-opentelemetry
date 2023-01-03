@@ -106,16 +106,16 @@ func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
 
 func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, kvs ...interface{}) {
 	var zlevel zapcore.Level
+	var sl *zap.SugaredLogger
 
-	var fields []zap.Field
 	span := trace.SpanFromContext(ctx)
 	if span.IsRecording() {
-		fields = append(fields, zap.Any(traceIDKey, span.SpanContext().TraceID()))
-		fields = append(fields, zap.Any(spanIDKey, span.SpanContext().SpanID()))
-		fields = append(fields, zap.Any(traceFlagsKey, span.SpanContext().TraceFlags()))
+		sl = l.With(
+			traceIDKey, span.SpanContext().TraceID(), spanIDKey, span.SpanContext().SpanID(), traceFlagsKey, span.SpanContext().TraceFlags())
+	} else {
+		sl = l.With()
 	}
 
-	sl := l.With(fields)
 	switch level {
 	case klog.LevelDebug, klog.LevelTrace:
 		zlevel = zap.DebugLevel
