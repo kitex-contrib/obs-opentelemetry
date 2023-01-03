@@ -212,7 +212,7 @@ func TestCtxKVLogger(t *testing.T) {
 
 	klog.SetLogger(logger)
 	klog.SetOutput(buf)
-	klog.SetLevel(klog.LevelDebug)
+	klog.SetLevel(klog.LevelTrace)
 
 	defer buf.Reset()
 	for _, level := range []klog.Level{
