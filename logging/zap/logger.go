@@ -321,7 +321,7 @@ func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, 
 		logSeverityTextKey.String(OtelSeverityText(zlevel)),
 	}
 
-	//notice: AddEvent,SetStatus,RecordError all have check span.IsRecording
+	// notice: AddEvent,SetStatus,RecordError all have check span.IsRecording
 	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
 
 	// set span status
