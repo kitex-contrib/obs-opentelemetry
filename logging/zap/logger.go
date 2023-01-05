@@ -45,7 +45,6 @@ var (
 
 type Logger struct {
 	*zap.SugaredLogger
-	l      *zap.Logger
 	config *config
 }
 
@@ -63,7 +62,6 @@ func NewLogger(opts ...Option) *Logger {
 
 	return &Logger{
 		SugaredLogger: logger.Sugar(),
-		l:             logger,
 		config:        config,
 	}
 }
@@ -266,7 +264,6 @@ func (l *Logger) SetOutput(writer io.Writer) {
 		l.config.zapOpts...,
 	)
 	l.config.coreConfig.ws = ws
-	l.l = log
 	l.SugaredLogger = log.Sugar()
 }
 
@@ -276,39 +273,36 @@ func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, 
 		return
 	}
 
-	var fields []zap.Field
-	for i := 0; i < len(kvs); i += 2 {
-		fields = append(fields, zap.Any(fmt.Sprint(kvs[i]), kvs[i+1]))
-	}
-
 	span := trace.SpanFromContext(ctx)
 	if span.IsRecording() {
-		fields = append(fields, zap.Any(traceIDKey, span.SpanContext().TraceID()))
-		fields = append(fields, zap.Any(spanIDKey, span.SpanContext().SpanID()))
-		fields = append(fields, zap.Any(traceFlagsKey, span.SpanContext().TraceFlags()))
+		kvs = append(kvs,
+			traceIDKey, span.SpanContext().TraceID(),
+			spanIDKey, span.SpanContext().SpanID(),
+			traceFlagsKey, span.SpanContext().TraceFlags(),
+		)
 	}
 
 	var zlevel zapcore.Level
-	zl := l.l.With()
+	zl := l.With()
 	switch level {
 	case klog.LevelDebug, klog.LevelTrace:
 		zlevel = zap.DebugLevel
-		zl.Debug(format, fields...)
+		zl.Debugw(format, kvs...)
 	case klog.LevelInfo:
 		zlevel = zap.InfoLevel
-		zl.Info(format, fields...)
+		zl.Infow(format, kvs...)
 	case klog.LevelNotice, klog.LevelWarn:
 		zlevel = zap.WarnLevel
-		zl.Warn(format, fields...)
+		zl.Warnw(format, kvs...)
 	case klog.LevelError:
 		zlevel = zap.ErrorLevel
-		zl.Error(format, fields...)
+		zl.Errorw(format, kvs...)
 	case klog.LevelFatal:
 		zlevel = zap.FatalLevel
-		zl.Fatal(format, fields...)
+		zl.Fatalw(format, kvs...)
 	default:
 		zlevel = zap.WarnLevel
-		zl.Warn(format, fields...)
+		zl.Warnw(format, kvs...)
 	}
 
 	if !span.IsRecording() {
