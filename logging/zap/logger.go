@@ -107,9 +107,18 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 	var sl *zap.SugaredLogger
 
 	span := trace.SpanFromContext(ctx)
-	if span.IsRecording() {
-		sl = l.With(
-			traceIDKey, span.SpanContext().TraceID(), spanIDKey, span.SpanContext().SpanID(), traceFlagsKey, span.SpanContext().TraceFlags())
+	var traceKVs []interface{}
+	if span.SpanContext().TraceID().IsValid() {
+		traceKVs = append(traceKVs, traceIDKey, span.SpanContext().TraceID())
+	}
+	if span.SpanContext().SpanID().IsValid() {
+		traceKVs = append(traceKVs, spanIDKey, span.SpanContext().SpanID())
+	}
+	if span.SpanContext().TraceFlags().IsSampled() {
+		traceKVs = append(traceKVs, traceFlagsKey, span.SpanContext().TraceFlags())
+	}
+	if len(traceKVs) > 0 {
+		sl = l.With(traceKVs...)
 	} else {
 		sl = l.With()
 	}
@@ -274,12 +283,14 @@ func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, 
 	}
 
 	span := trace.SpanFromContext(ctx)
-	if span.IsRecording() {
-		kvs = append(kvs,
-			traceIDKey, span.SpanContext().TraceID(),
-			spanIDKey, span.SpanContext().SpanID(),
-			traceFlagsKey, span.SpanContext().TraceFlags(),
-		)
+	if span.SpanContext().TraceID().IsValid() {
+		kvs = append(kvs, traceIDKey, span.SpanContext().TraceID())
+	}
+	if span.SpanContext().SpanID().IsValid() {
+		kvs = append(kvs, spanIDKey, span.SpanContext().SpanID())
+	}
+	if span.SpanContext().TraceFlags().IsSampled() {
+		kvs = append(kvs, traceFlagsKey, span.SpanContext().TraceFlags())
 	}
 
 	var zlevel zapcore.Level
