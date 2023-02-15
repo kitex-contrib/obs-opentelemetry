@@ -88,7 +88,12 @@ func TestLogger(t *testing.T) {
 		WithTraceErrorSpanLevel(zap.WarnLevel),
 		WithRecordStackTraceInSpan(true),
 	)
-	defer logger.Sync()
+	defer func() {
+		err := logger.Sync()
+		if err != nil {
+			return
+		}
+	}()
 
 	klog.SetLogger(logger)
 	klog.SetOutput(buf)
@@ -138,7 +143,12 @@ func TestLogLevel(t *testing.T) {
 		WithTraceErrorSpanLevel(zap.WarnLevel),
 		WithRecordStackTraceInSpan(true),
 	)
-	defer logger.Sync()
+	defer func() {
+		err := logger.Sync()
+		if err != nil {
+			return
+		}
+	}()
 
 	// output to buffer
 	logger.SetOutput(buf)
@@ -161,7 +171,12 @@ func TestCoreOption(t *testing.T) {
 		WithCoreLevel(zap.NewAtomicLevelAt(zapcore.WarnLevel)),
 		WithCoreWs(zapcore.AddSync(buf)),
 	)
-	defer logger.Sync()
+	defer func() {
+		err := logger.Sync()
+		if err != nil {
+			return
+		}
+	}()
 
 	logger.SetOutput(buf)
 
@@ -183,7 +198,12 @@ func TestZapOption(t *testing.T) {
 	logger := NewLogger(
 		WithZapOptions(zap.AddCaller()),
 	)
-	defer logger.Sync()
+	defer func() {
+		err := logger.Sync()
+		if err != nil {
+			return
+		}
+	}()
 
 	logger.SetOutput(buf)
 
@@ -193,4 +213,63 @@ func TestZapOption(t *testing.T) {
 	logger.Error("this is a warn log")
 	// test caller in log result
 	assert.True(t, strings.Contains(buf.String(), "caller"))
+}
+
+// TestCtxLogger test kv logger work with ctx
+func TestCtxKVLogger(t *testing.T) {
+	ctx := context.Background()
+
+	buf := new(bytes.Buffer)
+
+	shutdown := stdoutProvider(ctx)
+	defer shutdown()
+
+	logger := NewLogger(
+		WithTraceErrorSpanLevel(zap.WarnLevel),
+		WithRecordStackTraceInSpan(true),
+	)
+	defer func() {
+		err := logger.Sync()
+		if err != nil {
+			return
+		}
+	}()
+
+	klog.SetLogger(logger)
+	klog.SetOutput(buf)
+	klog.SetLevel(klog.LevelTrace)
+
+	for _, level := range []klog.Level{
+		klog.LevelTrace,
+		klog.LevelDebug,
+		klog.LevelInfo,
+		klog.LevelNotice,
+		klog.LevelWarn,
+		klog.LevelError,
+		// klog.LevelFatal,
+	} {
+		logger.CtxLogf(level, context.Background(), "log from origin zap %s=%s", "k1", "v1")
+		println(buf.String())
+		assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
+		assert.True(t, strings.Contains(buf.String(), "k1"))
+		assert.True(t, strings.Contains(buf.String(), "v1"))
+		buf.Reset()
+	}
+
+	for _, level := range []klog.Level{
+		klog.LevelTrace,
+		klog.LevelDebug,
+		klog.LevelInfo,
+		klog.LevelNotice,
+		klog.LevelWarn,
+		klog.LevelError,
+		// klog.LevelFatal,
+	} {
+		logger.CtxKVLog(context.Background(), level, "log from origin zap", "k1", "v1")
+		println(buf.String())
+		assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
+		assert.True(t, strings.Contains(buf.String(), "k1"))
+		assert.True(t, strings.Contains(buf.String(), "v1"))
+		buf.Reset()
+	}
 }
