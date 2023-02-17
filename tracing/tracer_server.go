@@ -23,7 +23,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric/instrument/syncfloat64"
+	"go.opentelemetry.io/otel/metric/instrument"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
@@ -32,7 +32,7 @@ var _ stats.Tracer = (*serverTracer)(nil)
 
 type serverTracer struct {
 	config            *config
-	histogramRecorder map[string]syncfloat64.Histogram
+	histogramRecorder map[string]instrument.Float64Histogram
 }
 
 func newServerOption(opts ...Option) (server.Option, *config) {
@@ -47,10 +47,10 @@ func newServerOption(opts ...Option) (server.Option, *config) {
 }
 
 func (s *serverTracer) createMeasures() {
-	serverDurationMeasure, err := s.config.meter.SyncFloat64().Histogram(ServerDuration)
+	serverDurationMeasure, err := s.config.meter.Float64Histogram(ServerDuration)
 	handleErr(err)
 
-	s.histogramRecorder = map[string]syncfloat64.Histogram{
+	s.histogramRecorder = map[string]instrument.Float64Histogram{
 		ServerDuration: serverDurationMeasure,
 	}
 }
