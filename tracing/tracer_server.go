@@ -18,15 +18,15 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/otel/metric"
-
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/stats"
 	"github.com/cloudwego/kitex/server"
-	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
+
+	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 )
 
 var _ stats.Tracer = (*serverTracer)(nil)
