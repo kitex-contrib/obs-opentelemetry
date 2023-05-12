@@ -22,7 +22,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/stats"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric/instrument"
+	"go.opentelemetry.io/otel/metric"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
@@ -31,7 +31,7 @@ var _ stats.Tracer = (*clientTracer)(nil)
 
 type clientTracer struct {
 	config            *config
-	histogramRecorder map[string]instrument.Float64Histogram
+	histogramRecorder map[string]metric.Float64Histogram
 }
 
 func newClientOption(opts ...Option) (client.Option, *config) {
@@ -47,7 +47,7 @@ func (c *clientTracer) createMeasures() {
 	clientDurationMeasure, err := c.config.meter.Float64Histogram(ClientDuration)
 	handleErr(err)
 
-	c.histogramRecorder = map[string]instrument.Float64Histogram{
+	c.histogramRecorder = map[string]metric.Float64Histogram{
 		ClientDuration: clientDurationMeasure,
 	}
 }
@@ -106,5 +106,5 @@ func (c *clientTracer) Finish(ctx context.Context) {
 	span.End(oteltrace.WithTimestamp(getEndTimeOrNow(ri)))
 
 	metricsAttributes := extractMetricsAttributesFromSpan(span)
-	c.histogramRecorder[ClientDuration].Record(ctx, elapsedTime, metricsAttributes...)
+	c.histogramRecorder[ClientDuration].Record(ctx, elapsedTime, metric.WithAttributes(metricsAttributes...))
 }
