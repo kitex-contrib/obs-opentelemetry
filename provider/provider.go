@@ -18,15 +18,13 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/otel/metric/global"
-	"go.opentelemetry.io/otel/sdk/metric"
-
 	"github.com/cloudwego/kitex/pkg/klog"
 	runtimemetrics "go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -148,7 +146,7 @@ func NewOpenTelemetryProvider(opts ...Option) OtelProvider {
 		}
 
 		// metrics pusher
-		global.SetMeterProvider(meterProvider)
+		otel.SetMeterProvider(meterProvider)
 
 		err = runtimemetrics.Start()
 		handleInitErr(err, "Failed to start runtime metrics collector")
