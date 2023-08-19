@@ -157,7 +157,7 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
 
 	// set span status
-	if zlevel <= l.config.traceConfig.errorSpanLevel {
+	if zlevel >= l.config.traceConfig.errorSpanLevel {
 		span.SetStatus(codes.Error, msg)
 		span.RecordError(errors.New(msg), trace.WithStackTrace(l.config.traceConfig.recordStackTraceInSpan))
 	}
@@ -330,7 +330,7 @@ func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, 
 	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
 
 	// set span status
-	if zlevel <= l.config.traceConfig.errorSpanLevel {
+	if zlevel >= l.config.traceConfig.errorSpanLevel {
 		span.SetStatus(codes.Error, msg)
 		span.RecordError(errors.New(msg), trace.WithStackTrace(l.config.traceConfig.recordStackTraceInSpan))
 	}
