@@ -66,6 +66,20 @@ func NewLogger(opts ...Option) *Logger {
 	}
 }
 
+// GetExtraKeys get extraKeys from logger config
+func (l *Logger) GetExtraKeys() []ExtraKey {
+	return l.config.extraKeys
+}
+
+// PutExtraKeys add extraKeys after init
+func (l *Logger) PutExtraKeys(keys ...ExtraKey) {
+	for _, k := range keys {
+		if !inArray(k, l.config.extraKeys) {
+			l.config.extraKeys = append(l.config.extraKeys, k)
+		}
+	}
+}
+
 func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
 	logger := l.With()
 	switch level {
@@ -121,6 +135,16 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 		sl = l.With(traceKVs...)
 	} else {
 		sl = l.With()
+	}
+
+	if len(l.config.extraKeys) > 0 {
+		for _, k := range l.config.extraKeys {
+			if l.config.extraKeyAsStr {
+				sl = sl.With(string(k), ctx.Value(string(k)))
+			} else {
+				sl = sl.With(string(k), ctx.Value(k))
+			}
+		}
 	}
 
 	switch level {

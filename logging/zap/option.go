@@ -21,6 +21,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+type ExtraKey string
+
 type Option interface {
 	apply(cfg *config)
 }
@@ -43,9 +45,11 @@ type traceConfig struct {
 }
 
 type config struct {
-	coreConfig  coreConfig
-	zapOpts     []zap.Option
-	traceConfig *traceConfig
+	extraKeys     []ExtraKey
+	coreConfig    coreConfig
+	zapOpts       []zap.Option
+	traceConfig   *traceConfig
+	extraKeyAsStr bool
 }
 
 // defaultCoreConfig default zapcore config: json encoder, atomic level, stdout write syncer
@@ -73,7 +77,8 @@ func defaultConfig() *config {
 			recordStackTraceInSpan: true,
 			errorSpanLevel:         zapcore.ErrorLevel,
 		},
-		zapOpts: []zap.Option{},
+		zapOpts:       []zap.Option{},
+		extraKeyAsStr: false,
 	}
 }
 
@@ -116,5 +121,27 @@ func WithTraceErrorSpanLevel(level zapcore.Level) Option {
 func WithRecordStackTraceInSpan(recordStackTraceInSpan bool) Option {
 	return option(func(cfg *config) {
 		cfg.traceConfig.recordStackTraceInSpan = recordStackTraceInSpan
+	})
+}
+
+// WithExtraKeys allow you log extra values from context
+func WithExtraKeys(keys []ExtraKey) Option {
+	return option(func(cfg *config) {
+		for _, k := range keys {
+			if !inArray(k, cfg.extraKeys) {
+				cfg.extraKeys = append(cfg.extraKeys, k)
+			}
+		}
+	})
+}
+
+// WithExtraKeyAsStr convert extraKey to a string type when retrieving value from context
+// Not recommended for use, only for compatibility with certain situations
+//
+// For more information, refer to the documentation at
+// `https://pkg.go.dev/context#WithValue`
+func WithExtraKeyAsStr() Option {
+	return option(func(cfg *config) {
+		cfg.extraKeyAsStr = true
 	})
 }

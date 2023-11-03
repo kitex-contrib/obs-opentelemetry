@@ -17,6 +17,7 @@ package zap
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -272,4 +273,67 @@ func TestCtxKVLogger(t *testing.T) {
 		assert.True(t, strings.Contains(buf.String(), "v1"))
 		buf.Reset()
 	}
+}
+
+// TestWithExtraKeys test WithExtraKeys option
+func TestWithExtraKeys(t *testing.T) {
+	buf := new(bytes.Buffer)
+
+	log := NewLogger(WithExtraKeys([]ExtraKey{"requestId"}))
+	log.SetOutput(buf)
+
+	ctx := context.WithValue(context.Background(), ExtraKey("requestId"), "123")
+
+	log.CtxInfof(ctx, "%s log", "extra")
+
+	var logStructMap map[string]interface{}
+
+	err := json.Unmarshal(buf.Bytes(), &logStructMap)
+
+	assert.Nil(t, err)
+
+	value, ok := logStructMap["requestId"]
+
+	assert.True(t, ok)
+	assert.Equal(t, value, "123")
+}
+
+func TestPutExtraKeys(t *testing.T) {
+	logger := NewLogger(WithExtraKeys([]ExtraKey{"abc"}))
+
+	assert.Contains(t, logger.GetExtraKeys(), ExtraKey("abc"))
+	assert.NotContains(t, logger.GetExtraKeys(), ExtraKey("def"))
+
+	logger.PutExtraKeys("def")
+	assert.Contains(t, logger.GetExtraKeys(), ExtraKey("def"))
+}
+
+func TestExtraKeyAsStr(t *testing.T) {
+	buf := new(bytes.Buffer)
+	const v = "value"
+
+	logger := NewLogger(WithExtraKeys([]ExtraKey{"abc"}))
+
+	logger.SetOutput(buf)
+
+	ctx1 := context.TODO()
+	ctx1 = context.WithValue(ctx1, "key1", v) //nolint:staticcheck
+	logger.CtxErrorf(ctx1, "%s", "error")
+
+	assert.NotContains(t, buf.String(), v)
+
+	buf.Reset()
+
+	strLogger := NewLogger(WithExtraKeys([]ExtraKey{"abc"}), WithExtraKeyAsStr())
+
+	strLogger.SetOutput(buf)
+
+	ctx2 := context.TODO()
+	ctx2 = context.WithValue(ctx2, "key2", v) //nolint:staticcheck
+
+	strLogger.CtxErrorf(ctx2, "key2", v)
+
+	assert.Contains(t, buf.String(), v)
+
+	buf.Reset()
 }
