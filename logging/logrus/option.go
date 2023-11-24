@@ -14,9 +14,7 @@
 
 package logrus
 
-import (
-	"github.com/sirupsen/logrus"
-)
+import "github.com/sirupsen/logrus"
 
 type Option interface {
 	apply(cfg *config)
@@ -36,13 +34,13 @@ type config struct {
 }
 
 func defaultConfig() *config {
-	// std logger
-	stdLogger := logrus.StandardLogger()
+	// default logger
+	logger := logrus.New()
 	// default json format
-	stdLogger.SetFormatter(new(logrus.JSONFormatter))
+	logger.SetFormatter(new(logrus.JSONFormatter))
 
 	return &config{
-		logger: logrus.StandardLogger(),
+		logger: logger,
 		hooks:  []logrus.Hook{},
 		traceHookConfig: &TraceHookConfig{
 			recordStackTraceInSpan: true,

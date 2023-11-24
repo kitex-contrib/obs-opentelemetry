@@ -50,10 +50,15 @@ func TestLogger(t *testing.T) {
 	shutdown := stdoutProvider(ctx)
 	defer shutdown()
 
+	// text formatter
+	stdLogger := logrus.StandardLogger()
+	stdLogger.SetFormatter(new(logrus.TextFormatter))
+
 	logger := kitexlogrus.NewLogger(
 		kitexlogrus.WithTraceHookErrorSpanLevel(logrus.WarnLevel),
 		kitexlogrus.WithTraceHookLevels(logrus.AllLevels),
 		kitexlogrus.WithRecordStackTraceInSpan(true),
+		kitexlogrus.WithLogger(stdLogger),
 	)
 
 	logger.Logger().Info("log from origin logrus")
