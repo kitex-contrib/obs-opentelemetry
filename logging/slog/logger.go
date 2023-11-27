@@ -159,19 +159,7 @@ func (l *Logger) CtxFatalf(ctx context.Context, format string, v ...interface{})
 }
 
 func (l *Logger) SetLevel(level klog.Level) {
-	var lvl slog.Level
-	switch level {
-	case klog.LevelTrace, klog.LevelDebug:
-		lvl = slog.LevelDebug
-	case klog.LevelInfo:
-		lvl = slog.LevelInfo
-	case klog.LevelWarn, klog.LevelNotice:
-		lvl = slog.LevelWarn
-	case klog.LevelError, klog.LevelFatal:
-		lvl = slog.LevelError
-	default:
-		lvl = slog.LevelWarn
-	}
+	lvl := tranSLevel(level)
 	l.config.coreConfig.level.Set(lvl)
 }
 
