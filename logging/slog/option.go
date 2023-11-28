@@ -65,22 +65,22 @@ func defaultCoreConfig() *coreConfig {
 	}
 }
 
-// WithCoreHandlerOption slog handler-option
-func WithCoreHandlerOption(opt *slog.HandlerOptions) Option {
+// WithHandlerOptions slog handler-options
+func WithHandlerOptions(opt *slog.HandlerOptions) Option {
 	return option(func(cfg *config) {
 		cfg.coreConfig.opt = *opt
 	})
 }
 
-// WithCoreWriter slog writer
-func WithCoreWriter(iow io.Writer) Option {
+// WithWriter slog writer
+func WithWriter(iow io.Writer) Option {
 	return option(func(cfg *config) {
 		cfg.coreConfig.writer = iow
 	})
 }
 
-// WithCoreLevel slog level
-func WithCoreLevel(lvl *slog.LevelVar) Option {
+// WithLevel slog level
+func WithLevel(lvl *slog.LevelVar) Option {
 	return option(func(cfg *config) {
 		cfg.coreConfig.opt.Level = lvl
 	})
