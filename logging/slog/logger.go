@@ -36,7 +36,6 @@ type Logger struct {
 }
 
 func NewLogger(opts ...Option) *Logger {
-
 	config := defaultConfig()
 
 	for _, opt := range opts {
@@ -164,7 +163,6 @@ func (l *Logger) SetLevel(level klog.Level) {
 }
 
 func (l *Logger) SetOutput(writer io.Writer) {
-
 	log := slog.New(NewTraceHandler(writer, &l.config.coreConfig.opt, l.config.traceConfig))
 	l.config.coreConfig.writer = writer
 	l.l = log
