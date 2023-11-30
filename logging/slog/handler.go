@@ -1,4 +1,4 @@
-// Copyright 2022 CloudWeGo Authors.
+// Copyright 2023 CloudWeGo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ func (t *traceHandler) Handle(ctx context.Context, record slog.Record) error {
 	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
 
 	// set span status
-	if record.Level <= t.tcfg.errorSpanLevel {
+	if record.Level >= t.tcfg.errorSpanLevel {
 		span.SetStatus(codes.Error, record.Message)
 		span.RecordError(errors.New(record.Message), trace.WithStackTrace(t.tcfg.recordStackTraceInSpan))
 	}

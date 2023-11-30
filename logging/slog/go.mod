@@ -1,6 +1,6 @@
 module github.com/kitex-contrib/obs-opentelemetry/logging/slog
 
-go 1.19
+go 1.21.4
 
 require (
 	github.com/cloudwego/kitex v0.7.3
