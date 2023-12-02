@@ -65,8 +65,8 @@ func TestLogger(t *testing.T) {
 	klog.SetOutput(buf)
 	klog.SetLevel(klog.LevelDebug)
 
-	logger.Info("log from origin zap")
-	assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
+	logger.Info("log from origin slog")
+	assert.True(t, strings.Contains(buf.String(), "log from origin slog"))
 	buf.Reset()
 
 	tracer := otel.Tracer("test otel std logger")
