@@ -124,7 +124,6 @@ func (l *Logger) Debug(v ...interface{}) {
 }
 
 func (l *Logger) Info(v ...interface{}) {
-
 	l.Log(klog.LevelInfo, fmt.Sprint(v...))
 }
 
@@ -206,7 +205,6 @@ func (l *Logger) SetLevel(level klog.Level) {
 }
 
 func (l *Logger) SetOutput(writer io.Writer) {
-
 	log := slog.New(NewTraceHandler(writer, l.config.coreConfig.opt, l.config.traceConfig))
 	l.config.coreConfig.writer = writer
 	l.l = log
