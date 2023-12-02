@@ -72,8 +72,8 @@ func WithHandlerOptions(opt *slog.HandlerOptions) Option {
 	})
 }
 
-// WithWriter slog writer
-func WithWriter(iow io.Writer) Option {
+// WithOutput slog writer
+func WithOutput(iow io.Writer) Option {
 	return option(func(cfg *config) {
 		cfg.coreConfig.writer = iow
 	})
