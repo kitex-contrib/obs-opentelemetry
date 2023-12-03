@@ -31,9 +31,11 @@ func (fn option) apply(cfg *config) {
 }
 
 type coreConfig struct {
-	opt    slog.HandlerOptions
-	writer io.Writer
-	level  *slog.LevelVar
+	opt                *slog.HandlerOptions
+	writer             io.Writer
+	level              *slog.LevelVar
+	withLevel          bool
+	withHandlerOptions bool
 }
 
 type config struct {
@@ -56,19 +58,21 @@ func defaultCoreConfig() *coreConfig {
 	level := new(slog.LevelVar)
 	level.Set(slog.LevelInfo)
 	return &coreConfig{
-		opt: slog.HandlerOptions{
-			Level:       level,
-			ReplaceAttr: replaceAttr,
+		opt: &slog.HandlerOptions{
+			Level: level,
 		},
-		writer: os.Stdout,
-		level:  level,
+		writer:             os.Stdout,
+		level:              level,
+		withLevel:          false,
+		withHandlerOptions: false,
 	}
 }
 
 // WithHandlerOptions slog handler-options
 func WithHandlerOptions(opt *slog.HandlerOptions) Option {
 	return option(func(cfg *config) {
-		cfg.coreConfig.opt = *opt
+		cfg.coreConfig.opt = opt
+		cfg.coreConfig.withHandlerOptions = true
 	})
 }
 
@@ -82,7 +86,8 @@ func WithOutput(iow io.Writer) Option {
 // WithLevel slog level
 func WithLevel(lvl *slog.LevelVar) Option {
 	return option(func(cfg *config) {
-		cfg.coreConfig.opt.Level = lvl
+		cfg.coreConfig.level = lvl
+		cfg.coreConfig.withLevel = true
 	})
 }
 
@@ -98,29 +103,4 @@ func WithRecordStackTraceInSpan(recordStackTraceInSpan bool) Option {
 	return option(func(cfg *config) {
 		cfg.traceConfig.recordStackTraceInSpan = recordStackTraceInSpan
 	})
-}
-
-func replaceAttr(_ []string, a slog.Attr) slog.Attr {
-	if a.Key == slog.LevelKey {
-		level := a.Value.Any().(slog.Level)
-		switch level {
-		case LevelTrace:
-			a.Value = slog.StringValue("Trace")
-		case slog.LevelDebug:
-			a.Value = slog.StringValue("Debug")
-		case slog.LevelInfo:
-			a.Value = slog.StringValue("Info")
-		case LevelNotice:
-			a.Value = slog.StringValue("Notice")
-		case slog.LevelWarn:
-			a.Value = slog.StringValue("Warn")
-		case slog.LevelError:
-			a.Value = slog.StringValue("Error")
-		case LevelFatal:
-			a.Value = slog.StringValue("Fatal")
-		default:
-			a.Value = slog.StringValue("Warn")
-		}
-	}
-	return a
 }

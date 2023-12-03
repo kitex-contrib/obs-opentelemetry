@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"log/slog"
+	"os"
 	"strings"
 	"testing"
 
@@ -64,15 +65,15 @@ func TestLogger(t *testing.T) {
 	klog.SetOutput(buf)
 	klog.SetLevel(klog.LevelDebug)
 
-	logger.Info("log from origin zap")
-	assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
+	logger.Info("log from origin slog")
+	assert.True(t, strings.Contains(buf.String(), "log from origin slog"))
 	buf.Reset()
 
 	tracer := otel.Tracer("test otel std logger")
 
 	ctx, span := tracer.Start(ctx, "root")
 
-	klog.CtxInfof(ctx, "hello %s", "world")
+	klog.CtxInfof(ctx, "hello %s", "you")
 	assert.True(t, strings.Contains(buf.String(), "trace_id"))
 	assert.True(t, strings.Contains(buf.String(), "span_id"))
 	assert.True(t, strings.Contains(buf.String(), "trace_flags"))
@@ -118,4 +119,32 @@ func TestLogLevel(t *testing.T) {
 
 	logger.Debugf("this is a debug log %s", "msg")
 	assert.True(t, strings.Contains(buf.String(), "this is a debug log"))
+}
+
+func TestLogOption(t *testing.T) {
+	buf := new(bytes.Buffer)
+
+	lvl := new(slog.LevelVar)
+	lvl.Set(slog.LevelDebug)
+	logger := NewLogger(
+		WithLevel(lvl),
+		WithOutput(buf),
+		WithHandlerOptions(&slog.HandlerOptions{
+			AddSource: true,
+			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+				if a.Key == slog.MessageKey {
+					msg := a.Value.Any().(string)
+					msg = strings.ReplaceAll(msg, "log", "new log")
+					a.Value = slog.StringValue(msg)
+				}
+				return a
+			},
+		}),
+	)
+
+	logger.Debug("this is a debug log")
+	assert.True(t, strings.Contains(buf.String(), "this is a debug new log"))
+
+	dir, _ := os.Getwd()
+	assert.True(t, strings.Contains(buf.String(), dir))
 }

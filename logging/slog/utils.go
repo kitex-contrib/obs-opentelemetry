@@ -40,18 +40,6 @@ func getMessage(template string, fmtArgs []interface{}) string {
 	return fmt.Sprint(fmtArgs...)
 }
 
-// Adapt to slog
-func tranAtrr(v ...interface{}) (string, []interface{}) {
-	var msg string
-	if len(v) == 0 {
-		msg = ""
-	} else if len(v) >= 1 {
-		msg = fmt.Sprint(v[0])
-		v = v[1:]
-	}
-	return msg, v
-}
-
 // OtelSeverityText convert slog level to otel severityText
 // ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#severity-fields
 func OtelSeverityText(lv slog.Level) string {

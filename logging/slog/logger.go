@@ -16,6 +16,7 @@ package slog
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 
@@ -41,17 +42,65 @@ func NewLogger(opts ...Option) *Logger {
 	for _, opt := range opts {
 		opt.apply(config)
 	}
+	// When user set the handlerOptions level but not set with coreconfig level
+	if !config.coreConfig.withLevel && config.coreConfig.withHandlerOptions && config.coreConfig.opt.Level != nil {
+		lvl := &slog.LevelVar{}
+		lvl.Set(config.coreConfig.opt.Level.Level())
+		config.coreConfig.level = lvl
+	}
+	config.coreConfig.opt.Level = config.coreConfig.level
 
-	logger := slog.New(NewTraceHandler(config.coreConfig.writer, &config.coreConfig.opt, config.traceConfig))
+	var replaceAttrDefined bool
+	if config.coreConfig.opt.ReplaceAttr == nil {
+		replaceAttrDefined = false
+	} else {
+		replaceAttrDefined = true
+	}
+
+	replaceFunc := config.coreConfig.opt.ReplaceAttr
+
+	replaceAttr := func(groups []string, a slog.Attr) slog.Attr {
+		// default replaceAttr level
+		if a.Key == slog.LevelKey {
+			level := a.Value.Any().(slog.Level)
+			switch level {
+			case LevelTrace:
+				a.Value = slog.StringValue("Trace")
+			case slog.LevelDebug:
+				a.Value = slog.StringValue("Debug")
+			case slog.LevelInfo:
+				a.Value = slog.StringValue("Info")
+			case LevelNotice:
+				a.Value = slog.StringValue("Notice")
+			case slog.LevelWarn:
+				a.Value = slog.StringValue("Warn")
+			case slog.LevelError:
+				a.Value = slog.StringValue("Error")
+			case LevelFatal:
+				a.Value = slog.StringValue("Fatal")
+			default:
+				a.Value = slog.StringValue("Warn")
+			}
+		}
+		// append replaceAttr by user
+		if replaceAttrDefined {
+			return replaceFunc(groups, a)
+		} else {
+			return a
+		}
+	}
+	config.coreConfig.opt.ReplaceAttr = replaceAttr
+
+	logger := slog.New(NewTraceHandler(config.coreConfig.writer, config.coreConfig.opt, config.traceConfig))
 	return &Logger{
 		l:      logger,
 		config: config,
 	}
 }
 
-func (l *Logger) Log(level klog.Level, msg string, kvs ...interface{}) {
+func (l *Logger) Log(level klog.Level, msg string) {
 	logger := l.l.With()
-	logger.Log(context.TODO(), tranSLevel(level), msg, kvs...)
+	logger.Log(context.TODO(), tranSLevel(level), msg)
 }
 
 func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
@@ -67,38 +116,31 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 }
 
 func (l *Logger) Trace(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelTrace, msg, kvs...)
+	l.Log(klog.LevelTrace, fmt.Sprint(v...))
 }
 
 func (l *Logger) Debug(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelDebug, msg, kvs...)
+	l.Log(klog.LevelDebug, fmt.Sprint(v...))
 }
 
 func (l *Logger) Info(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelInfo, msg, kvs...)
+	l.Log(klog.LevelInfo, fmt.Sprint(v...))
 }
 
 func (l *Logger) Notice(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelNotice, msg, kvs...)
+	l.Log(klog.LevelNotice, fmt.Sprint(v...))
 }
 
 func (l *Logger) Warn(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelWarn, msg, kvs...)
+	l.Log(klog.LevelWarn, fmt.Sprint(v...))
 }
 
 func (l *Logger) Error(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelError, msg, kvs...)
+	l.Log(klog.LevelError, fmt.Sprint(v...))
 }
 
 func (l *Logger) Fatal(v ...interface{}) {
-	msg, kvs := tranAtrr(v)
-	l.Log(klog.LevelFatal, msg, kvs...)
+	l.Log(klog.LevelFatal, fmt.Sprint(v...))
 }
 
 func (l *Logger) Tracef(format string, v ...interface{}) {
@@ -114,7 +156,7 @@ func (l *Logger) Infof(format string, v ...interface{}) {
 }
 
 func (l *Logger) Noticef(format string, v ...interface{}) {
-	l.Logf(klog.LevelInfo, format, v...)
+	l.Logf(klog.LevelNotice, format, v...)
 }
 
 func (l *Logger) Warnf(format string, v ...interface{}) {
@@ -130,7 +172,7 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 }
 
 func (l *Logger) CtxTracef(ctx context.Context, format string, v ...interface{}) {
-	l.CtxLogf(klog.LevelDebug, ctx, format, v...)
+	l.CtxLogf(klog.LevelTrace, ctx, format, v...)
 }
 
 func (l *Logger) CtxDebugf(ctx context.Context, format string, v ...interface{}) {
@@ -142,7 +184,7 @@ func (l *Logger) CtxInfof(ctx context.Context, format string, v ...interface{}) 
 }
 
 func (l *Logger) CtxNoticef(ctx context.Context, format string, v ...interface{}) {
-	l.CtxLogf(klog.LevelWarn, ctx, format, v...)
+	l.CtxLogf(klog.LevelNotice, ctx, format, v...)
 }
 
 func (l *Logger) CtxWarnf(ctx context.Context, format string, v ...interface{}) {
@@ -163,7 +205,7 @@ func (l *Logger) SetLevel(level klog.Level) {
 }
 
 func (l *Logger) SetOutput(writer io.Writer) {
-	log := slog.New(NewTraceHandler(writer, &l.config.coreConfig.opt, l.config.traceConfig))
+	log := slog.New(NewTraceHandler(writer, l.config.coreConfig.opt, l.config.traceConfig))
 	l.config.coreConfig.writer = writer
 	l.l = log
 }
