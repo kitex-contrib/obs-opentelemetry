@@ -128,7 +128,7 @@ func TestLogOption(t *testing.T) {
 	lvl.Set(slog.LevelDebug)
 	logger := NewLogger(
 		WithLevel(lvl),
-		WithWriter(buf),
+		WithOutput(buf),
 		WithHandlerOptions(&slog.HandlerOptions{
 			AddSource: true,
 			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
