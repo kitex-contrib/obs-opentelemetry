@@ -36,13 +36,13 @@ type config struct {
 }
 
 func defaultConfig() *config {
-	// std logger
-	stdLogger := logrus.StandardLogger()
+	// new logger
+	logger := logrus.New()
 	// default json format
-	stdLogger.SetFormatter(new(logrus.JSONFormatter))
+	logger.SetFormatter(new(logrus.JSONFormatter))
 
 	return &config{
-		logger: logrus.StandardLogger(),
+		logger: logger,
 		hooks:  []logrus.Hook{},
 		traceHookConfig: &TraceHookConfig{
 			recordStackTraceInSpan: true,
