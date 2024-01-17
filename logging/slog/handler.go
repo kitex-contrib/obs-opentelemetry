@@ -20,7 +20,6 @@ import (
 	"io"
 	"log/slog"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -29,12 +28,6 @@ const (
 	traceIDKey    = "trace_id"
 	spanIDKey     = "span_id"
 	traceFlagsKey = "trace_flags"
-	logEventKey   = "log"
-)
-
-var (
-	logSeverityTextKey = attribute.Key("otel.log.severity.text")
-	logMessageKey      = attribute.Key("otel.log.message")
 )
 
 type traceConfig struct {
@@ -79,16 +72,9 @@ func (t *traceHandler) Handle(ctx context.Context, record slog.Record) error {
 		return t.Handler.Handle(ctx, record)
 	}
 
-	attrs := []attribute.KeyValue{
-		logMessageKey.String(record.Message),
-		logSeverityTextKey.String(OtelSeverityText(record.Level)),
-	}
-
-	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
-
 	// set span status
 	if record.Level >= t.tcfg.errorSpanLevel {
-		span.SetStatus(codes.Error, record.Message)
+		span.SetStatus(codes.Error, "")
 		span.RecordError(errors.New(record.Message), trace.WithStackTrace(t.tcfg.recordStackTraceInSpan))
 	}
 

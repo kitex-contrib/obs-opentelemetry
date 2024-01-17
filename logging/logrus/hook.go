@@ -18,7 +18,6 @@ import (
 	"errors"
 
 	"github.com/sirupsen/logrus"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -28,12 +27,6 @@ const (
 	traceIDKey    = "trace_id"
 	spanIDKey     = "span_id"
 	traceFlagsKey = "trace_flags"
-	logEventKey   = "log"
-)
-
-var (
-	logSeverityTextKey = attribute.Key("otel.log.severity.text")
-	logMessageKey      = attribute.Key("otel.log.message")
 )
 
 var _ logrus.Hook = (*TraceHook)(nil)
@@ -73,17 +66,11 @@ func (h *TraceHook) Fire(entry *logrus.Entry) error {
 	entry.Data[spanIDKey] = span.SpanContext().SpanID()
 	entry.Data[traceFlagsKey] = span.SpanContext().TraceFlags()
 
-	// attach log to span event attributes
-	attrs := []attribute.KeyValue{
-		logMessageKey.String(entry.Message),
-		logSeverityTextKey.String(OtelSeverityText(entry.Level)),
-	}
-
-	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
-
-	// set span status
 	if entry.Level <= h.cfg.errorSpanLevel {
-		span.SetStatus(codes.Error, entry.Message)
+		// set span status
+		span.SetStatus(codes.Error, "")
+
+		// record error with stack trace
 		span.RecordError(errors.New(entry.Message), trace.WithStackTrace(h.cfg.recordStackTraceInSpan))
 	}
 

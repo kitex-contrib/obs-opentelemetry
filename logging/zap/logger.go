@@ -21,7 +21,6 @@ import (
 	"io"
 
 	"github.com/cloudwego/kitex/pkg/klog"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -35,12 +34,6 @@ const (
 	traceIDKey    = "trace_id"
 	spanIDKey     = "span_id"
 	traceFlagsKey = "trace_flags"
-	logEventKey   = "log"
-)
-
-var (
-	logSeverityTextKey = attribute.Key("otel.log.severity.text")
-	logMessageKey      = attribute.Key("otel.log.message")
 )
 
 type Logger struct {
@@ -172,17 +165,10 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 		return
 	}
 
-	msg := getMessage(format, kvs)
-
-	attrs := []attribute.KeyValue{
-		logMessageKey.String(msg),
-		logSeverityTextKey.String(OtelSeverityText(zlevel)),
-	}
-	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
-
 	// set span status
 	if zlevel >= l.config.traceConfig.errorSpanLevel {
-		span.SetStatus(codes.Error, msg)
+		msg := getMessage(format, kvs)
+		span.SetStatus(codes.Error, "")
 		span.RecordError(errors.New(msg), trace.WithStackTrace(l.config.traceConfig.recordStackTraceInSpan))
 	}
 }
@@ -344,18 +330,10 @@ func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, 
 		return
 	}
 
-	msg := getMessage(format, kvs)
-	attrs := []attribute.KeyValue{
-		logMessageKey.String(msg),
-		logSeverityTextKey.String(OtelSeverityText(zlevel)),
-	}
-
-	// notice: AddEvent,SetStatus,RecordError all have check span.IsRecording
-	span.AddEvent(logEventKey, trace.WithAttributes(attrs...))
-
 	// set span status
 	if zlevel >= l.config.traceConfig.errorSpanLevel {
-		span.SetStatus(codes.Error, msg)
+		msg := getMessage(format, kvs)
+		span.SetStatus(codes.Error, "")
 		span.RecordError(errors.New(msg), trace.WithStackTrace(l.config.traceConfig.recordStackTraceInSpan))
 	}
 }
