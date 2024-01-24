@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/contrib/propagators/ot"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -158,6 +159,45 @@ func TestCGIVariableToHTTPHeaderMetadata(t *testing.T) {
 			if got := CGIVariableToHTTPHeaderMetadata(tt.args.metadata); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CGIVariableToHTTPHeaderMetadata() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestExtractFromPropagator(t *testing.T) {
+	otel.SetTextMapPropagator(propagation.Baggage{})
+
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			name: "valid",
+			args: args{
+				ctx: metainfo.WithValue(context.Background(), "baggage", "foo=bar"),
+			},
+			want: map[string]string{
+				"baggage": "foo=bar",
+			},
+		},
+		{
+			name: "not valid",
+			args: args{
+				ctx: metainfo.WithValue(context.Background(), "other", "foo=bar"),
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := otel.GetTextMapPropagator().Extract(
+				tt.args.ctx,
+				&metadataProvider{metadata: ExtractFromPropagator(tt.args.ctx)},
+			)
+			assert.Equal(t, baggage.FromContext(ctx).String(), tt.want["baggage"])
 		})
 	}
 }

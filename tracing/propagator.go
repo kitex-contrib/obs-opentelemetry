@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -70,4 +71,14 @@ func CGIVariableToHTTPHeaderMetadata(metadata map[string]string) map[string]stri
 		res[metainfo.CGIVariableToHTTPHeader(k)] = v
 	}
 	return res
+}
+
+// ExtractFromPropagator get metadata from propagator
+func ExtractFromPropagator(ctx context.Context) map[string]string {
+	metadata := metainfo.GetAllValues(ctx)
+	if metadata == nil {
+		metadata = make(map[string]string)
+	}
+	otel.GetTextMapPropagator().Inject(ctx, &metadataProvider{metadata: metadata})
+	return metadata
 }
