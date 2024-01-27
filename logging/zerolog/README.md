@@ -24,13 +24,18 @@ import kitexzerolog github.com/kitex-contrib/obs-opentelemetry/logging/zerolog
 package main
 
 import (
+    "github.com/rs/zerolog/log"
     "github.com/cloudwego/kitex/pkg/klog"
     kitexzerolog "github.com/kitex-contrib/obs-opentelemetry/logging/zerolog"
 )
 
 func main() {
-    klog.SetLogger(kitexzerolog.NewLogger())
+    logger := kitexzerolog.NewLogger()
+    klog.SetLogger(logger)
     klog.SetLevel(klog.LevelDebug)
+
+    // OR / AND using global logger
+    log.Logger = *logger.Logger()
 }
 ```
 
@@ -48,6 +53,22 @@ func main() {
 // Echo implements the Echo interface.
 func (s *EchoImpl) Echo(ctx context.Context, req *api.Request) (resp *api.Response, err error) {
     klog.CtxDebugf(ctx, "echo called: %s", req.GetMessage())
+    return &api.Response{Message: req.Message}, nil
+}
+```
+
+### Log with global logger
+
+In case your code base has already used global logger from zerolog
+
+```go
+import (
+    "github.com/rs/zerolog/log"
+)
+
+// Echo implements the Echo interface.
+func (s *EchoImpl) Echo(ctx context.Context, req *api.Request) (resp *api.Response, err error) {
+    log.Debug().Ctx(ctx).Msgf("echo called: %s", req.GetMessage())
     return &api.Response{Message: req.Message}, nil
 }
 ```
