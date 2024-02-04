@@ -286,6 +286,11 @@ func (l *Logger) SetOutput(writer io.Writer) {
 	l.SugaredLogger = log.Sugar()
 }
 
+// Logger is used to return an instance of *zap.Logger for custom fields, etc.
+func (l *Logger) Logger() *zap.Logger {
+	return l.SugaredLogger.Desugar()
+}
+
 func (l *Logger) CtxKVLog(ctx context.Context, level klog.Level, format string, kvs ...interface{}) {
 	if len(kvs) == 0 || len(kvs)%2 != 0 {
 		l.Warn(fmt.Sprint("Keyvalues must appear in pairs:", kvs))
