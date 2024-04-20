@@ -17,6 +17,8 @@ package tracing
 import (
 	"context"
 
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
+
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"go.opentelemetry.io/otel/attribute"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
@@ -57,6 +59,25 @@ func extractPeerServiceAttributesFromMetaInfo(md map[string]string) []attribute.
 		case string(semconv.DeploymentEnvironmentKey):
 			attrs = append(attrs, PeerDeploymentEnvironmentKey.String(v))
 		}
+	}
+
+	return attrs
+}
+
+func extractPeerServiceAttributesFromMetadata(md metadata.MD) []attribute.KeyValue {
+	var (
+		attrs      []attribute.KeyValue
+		mdSupplier = metadataSupplier{metadata: &md}
+	)
+
+	if v := mdSupplier.Get(string(semconv.ServiceNameKey)); v != "" {
+		attrs = append(attrs, semconv.PeerServiceKey.String(v))
+	}
+	if v := mdSupplier.Get(string(semconv.ServiceNamespaceKey)); v != "" {
+		attrs = append(attrs, PeerServiceNamespaceKey.String(v))
+	}
+	if v := mdSupplier.Get(string(semconv.DeploymentEnvironmentKey)); v != "" {
+		attrs = append(attrs, PeerDeploymentEnvironmentKey.String(v))
 	}
 
 	return attrs
