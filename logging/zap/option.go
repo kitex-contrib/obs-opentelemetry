@@ -105,10 +105,10 @@ func WithCoreLevel(lvl zap.AtomicLevel) Option {
 	})
 }
 
-// WithCustomField record log with the key-value pair.
-func WithCustomField(k string, v interface{}) Option {
+// WithCustomFields record log with the key-value pair.
+func WithCustomFields(kv ...interface{}) Option {
 	return option(func(cfg *config) {
-		cfg.customFields = append(cfg.customFields, k, v)
+		cfg.customFields = append(cfg.customFields, kv...)
 	})
 }
 

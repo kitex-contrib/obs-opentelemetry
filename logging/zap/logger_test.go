@@ -283,7 +283,7 @@ func TestWithKeyValue(t *testing.T) {
 	t.Run("ctx info", func(t *testing.T) {
 		buf.Reset()
 
-		log := NewLogger(WithCustomField(key, value))
+		log := NewLogger(WithCustomFields(key, value))
 		log.SetOutput(buf)
 
 		ctx := context.Background()
@@ -306,7 +306,7 @@ func TestWithKeyValue(t *testing.T) {
 	t.Run("infof", func(t *testing.T) {
 		buf.Reset()
 
-		log := NewLogger(WithCustomField(key, value))
+		log := NewLogger(WithCustomFields(key, value))
 		log.SetOutput(buf)
 
 		log.Infof("%s log", "extra")
@@ -328,7 +328,7 @@ func TestWithKeyValue(t *testing.T) {
 	t.Run("info", func(t *testing.T) {
 		buf.Reset()
 
-		log := NewLogger(WithCustomField(key, value))
+		log := NewLogger(WithCustomFields(key, value))
 		log.SetOutput(buf)
 
 		log.Info("extra log")
