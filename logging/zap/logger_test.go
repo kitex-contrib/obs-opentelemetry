@@ -275,6 +275,79 @@ func TestCtxKVLogger(t *testing.T) {
 	}
 }
 
+func TestWithKeyValue(t *testing.T) {
+	key := "service_name"
+	value := "kitex"
+	buf := new(bytes.Buffer)
+
+	t.Run("ctx info", func(t *testing.T) {
+		buf.Reset()
+
+		log := NewLogger(WithCustomField(key, value))
+		log.SetOutput(buf)
+
+		ctx := context.Background()
+		log.CtxInfof(ctx, "%s log", "extra")
+
+		logStructMap := make(map[string]interface{}, 0)
+
+		err := json.Unmarshal(buf.Bytes(), &logStructMap)
+		assert.Nil(t, err)
+
+		ret, ok := logStructMap[key]
+		assert.True(t, ok)
+		assert.Equal(t, value, ret)
+
+		ret, ok = logStructMap["msg"]
+		assert.True(t, ok)
+		assert.Equal(t, "extra log", ret)
+	})
+
+	t.Run("infof", func(t *testing.T) {
+		buf.Reset()
+
+		log := NewLogger(WithCustomField(key, value))
+		log.SetOutput(buf)
+
+		log.Infof("%s log", "extra")
+
+		logStructMap := make(map[string]interface{}, 0)
+
+		err := json.Unmarshal(buf.Bytes(), &logStructMap)
+		assert.Nil(t, err)
+
+		ret, ok := logStructMap[key]
+		assert.True(t, ok)
+		assert.Equal(t, value, ret)
+
+		ret, ok = logStructMap["msg"]
+		assert.True(t, ok)
+		assert.Equal(t, "extra log", ret)
+	})
+
+	t.Run("info", func(t *testing.T) {
+		buf.Reset()
+
+		log := NewLogger(WithCustomField(key, value))
+		log.SetOutput(buf)
+
+		log.Info("extra log")
+
+		logStructMap := make(map[string]interface{}, 0)
+
+		err := json.Unmarshal(buf.Bytes(), &logStructMap)
+		assert.Nil(t, err)
+
+		ret, ok := logStructMap[key]
+		assert.True(t, ok)
+		assert.Equal(t, value, ret)
+
+		ret, ok = logStructMap["msg"]
+		assert.True(t, ok)
+		assert.Equal(t, "extra log", ret)
+	})
+}
+
 // TestWithExtraKeys test WithExtraKeys option
 func TestWithExtraKeys(t *testing.T) {
 	buf := new(bytes.Buffer)

@@ -74,7 +74,8 @@ func (l *Logger) PutExtraKeys(keys ...ExtraKey) {
 }
 
 func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
-	logger := l.With()
+	logger := l.With(l.config.customFields...)
+
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
 		logger.Debug(kvs...)
@@ -92,7 +93,8 @@ func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
 }
 
 func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
-	logger := l.With()
+	logger := l.With(l.config.customFields...)
+
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
 		logger.Debugf(format, kvs...)
@@ -129,6 +131,8 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 	} else {
 		sl = l.With()
 	}
+
+	sl = sl.With(l.config.customFields...)
 
 	if len(l.config.extraKeys) > 0 {
 		for _, k := range l.config.extraKeys {
