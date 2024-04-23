@@ -54,7 +54,7 @@ func NewLogger(opts ...Option) *Logger {
 		config.zapOpts...)
 
 	return &Logger{
-		SugaredLogger: logger.Sugar(),
+		SugaredLogger: logger.Sugar().With(config.customFields...),
 		config:        config,
 	}
 }
@@ -74,7 +74,7 @@ func (l *Logger) PutExtraKeys(keys ...ExtraKey) {
 }
 
 func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
-	logger := l.With(l.config.customFields...)
+	logger := l.With()
 
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
@@ -93,7 +93,7 @@ func (l *Logger) Log(level klog.Level, kvs ...interface{}) {
 }
 
 func (l *Logger) Logf(level klog.Level, format string, kvs ...interface{}) {
-	logger := l.With(l.config.customFields...)
+	logger := l.With()
 
 	switch level {
 	case klog.LevelTrace, klog.LevelDebug:
@@ -131,8 +131,6 @@ func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, k
 	} else {
 		sl = l.With()
 	}
-
-	sl = sl.With(l.config.customFields...)
 
 	if len(l.config.extraKeys) > 0 {
 		for _, k := range l.config.extraKeys {
@@ -287,7 +285,7 @@ func (l *Logger) SetOutput(writer io.Writer) {
 		l.config.zapOpts...,
 	)
 	l.config.coreConfig.ws = ws
-	l.SugaredLogger = log.Sugar()
+	l.SugaredLogger = log.Sugar().With(l.config.customFields...)
 }
 
 // Logger is used to return an instance of *zap.Logger for custom fields, etc.
