@@ -45,6 +45,7 @@ type traceConfig struct {
 }
 
 type config struct {
+	customFields  []interface{}
 	extraKeys     []ExtraKey
 	coreConfig    coreConfig
 	zapOpts       []zap.Option
@@ -79,6 +80,7 @@ func defaultConfig() *config {
 		},
 		zapOpts:       []zap.Option{},
 		extraKeyAsStr: false,
+		customFields:  []interface{}{},
 	}
 }
 
@@ -100,6 +102,13 @@ func WithCoreWs(ws zapcore.WriteSyncer) Option {
 func WithCoreLevel(lvl zap.AtomicLevel) Option {
 	return option(func(cfg *config) {
 		cfg.coreConfig.lvl = lvl
+	})
+}
+
+// WithCustomFields record log with the key-value pair.
+func WithCustomFields(kv ...interface{}) Option {
+	return option(func(cfg *config) {
+		cfg.customFields = append(cfg.customFields, kv...)
 	})
 }
 
