@@ -20,6 +20,7 @@ import (
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/kitex/pkg/endpoint"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 	"go.opentelemetry.io/otel/baggage"
@@ -42,6 +43,13 @@ func ClientMiddleware(cfg *config) endpoint.Middleware {
 			md := injectPeerServiceToMetaInfo(ctx, readOnlySpan.Resource().Attributes())
 
 			Inject(ctx, cfg, md)
+
+			if cfg.enableMetadata {
+				grpcMd, ok := metadata.FromOutgoingContext(ctx)
+				if ok {
+					ctx = injectMetadata(ctx, cfg, grpcMd)
+				}
+			}
 
 			for k, v := range md {
 				ctx = metainfo.WithValue(ctx, k, v)
@@ -73,6 +81,14 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 
 			md := metainfo.GetAllValues(ctx)
 			peerServiceAttributes := extractPeerServiceAttributesFromMetaInfo(md)
+
+			if cfg.enableMetadata {
+				grpcMd, ok := metadata.FromIncomingContext(ctx)
+				if ok {
+					ctx = extractMetadata(ctx, cfg, grpcMd)
+					peerServiceAttributes = extractPeerServiceAttributesFromMetadata(grpcMd)
+				}
+			}
 
 			bags, spanCtx := Extract(ctx, cfg, md)
 			ctx = baggage.ContextWithBaggage(ctx, bags)
