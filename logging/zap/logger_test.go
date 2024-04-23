@@ -275,7 +275,8 @@ func TestCtxKVLogger(t *testing.T) {
 	}
 }
 
-func TestWithKeyValue(t *testing.T) {
+// TestWithCustomFields test WithCustomFileds option.
+func TestWithCustomFields(t *testing.T) {
 	key := "service_name"
 	value := "kitex"
 	buf := new(bytes.Buffer)
