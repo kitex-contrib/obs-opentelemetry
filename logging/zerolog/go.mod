@@ -3,7 +3,7 @@ module github.com/kitex-contrib/obs-opentelemetry/logging/zerolog
 go 1.19
 
 require (
-	github.com/cloudwego/kitex v0.7.3
+	github.com/cloudwego/kitex v0.9.1
 	github.com/rs/zerolog v1.31.0
 	go.opentelemetry.io/otel v1.19.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.16.0
