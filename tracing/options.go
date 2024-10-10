@@ -45,7 +45,7 @@ type config struct {
 	textMapPropagator propagation.TextMapPropagator
 
 	recordSourceOperation bool
-	enableMetadata        bool
+	enableGRPCMetadata    bool
 }
 
 func newConfig(opts []Option) *config {
@@ -90,9 +90,9 @@ func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
 	})
 }
 
-// WithEnableMetadata Enable retrieving data from metadata or adding data to metadata
-func WithEnableMetadata() Option {
+// WithEnableGRPCMetadata Enable retrieving data from metadata or adding data to metadata
+func WithEnableGRPCMetadata() Option {
 	return option(func(cfg *config) {
-		cfg.enableMetadata = true
+		cfg.enableGRPCMetadata = true
 	})
 }

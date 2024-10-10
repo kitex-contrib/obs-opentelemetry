@@ -44,7 +44,7 @@ func ClientMiddleware(cfg *config) endpoint.Middleware {
 
 			Inject(ctx, cfg, md)
 
-			if cfg.enableMetadata {
+			if cfg.enableGRPCMetadata {
 				grpcMd, ok := metadata.FromOutgoingContext(ctx)
 				if ok {
 					ctx = injectMetadata(ctx, cfg, grpcMd)
@@ -82,7 +82,7 @@ func ServerMiddleware(cfg *config) endpoint.Middleware {
 			md := metainfo.GetAllValues(ctx)
 			peerServiceAttributes := extractPeerServiceAttributesFromMetaInfo(md)
 
-			if cfg.enableMetadata {
+			if cfg.enableGRPCMetadata {
 				grpcMd, ok := metadata.FromIncomingContext(ctx)
 				if ok {
 					ctx = extractMetadata(ctx, cfg, grpcMd)
