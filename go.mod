@@ -6,11 +6,11 @@ require (
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/bytedance/gopkg v0.0.0-20230728082804-614d0af6619b
 	github.com/cloudwego/kitex v0.9.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.45.0
 	go.opentelemetry.io/contrib/propagators/b3 v1.20.0
-	go.opentelemetry.io/contrib/propagators/ot v1.20.0
-	go.opentelemetry.io/otel v1.19.0
+	go.opentelemetry.io/contrib/propagators/ot v1.25.0
+	go.opentelemetry.io/otel v1.25.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.42.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.19.0
@@ -18,7 +18,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.19.0
 	go.opentelemetry.io/otel/sdk/metric v1.19.0
 	go.opentelemetry.io/otel/trace v1.19.0
-	github.com/cloudwego-contrib/cwgo-pkg/telemetry v0.0.0
 )
 
 require (
@@ -71,5 +70,3 @@ require (
 )
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
-
-replace github.com/cloudwego-contrib/cwgo-pkg/telemetry => D:\Projects\Go\cwgo-pkg\telemetry
