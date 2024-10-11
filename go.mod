@@ -18,6 +18,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.19.0
 	go.opentelemetry.io/otel/sdk/metric v1.19.0
 	go.opentelemetry.io/otel/trace v1.19.0
+	github.com/cloudwego-contrib/cwgo-pkg/telemetry v0.0.0
 )
 
 require (
@@ -70,3 +71,5 @@ require (
 )
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
+
+replace github.com/cloudwego-contrib/cwgo-pkg/telemetry => D:\Projects\Go\cwgo-pkg\telemetry

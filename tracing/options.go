@@ -46,7 +46,5 @@ func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
 
 // WithEnableGRPCMetadata Enable retrieving data from metadata or adding data to metadata
 func WithEnableGRPCMetadata() Option {
-	return option(func(cfg *config) {
-		cfg.enableGRPCMetadata = true
-	})
+	return otelkitex.WithEnableGRPCMetadata()
 }
