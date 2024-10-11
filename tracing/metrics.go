@@ -14,14 +14,7 @@
 
 package tracing
 
-import (
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
-	oteltrace "go.opentelemetry.io/otel/trace"
-)
-
-// RPC Server metrics
+/*// RPC Server metrics
 // ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/rpc.md#rpc-server
 const (
 	ServerDuration        = "rpc.server.duration"          // measures duration of inbound RPC
@@ -114,3 +107,4 @@ func matchAttributeKey(key attribute.Key, toMatchKeys []attribute.Key) bool {
 	}
 	return false
 }
+*/

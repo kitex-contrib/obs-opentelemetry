@@ -15,10 +15,8 @@
 package tracing
 
 import (
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/metric"
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -26,9 +24,7 @@ const (
 )
 
 // Option opts for opentelemetry tracer provider
-type Option interface {
-	apply(cfg *config)
-}
+type Option = otelkitex.Option
 
 type option func(cfg *config)
 
@@ -36,55 +32,14 @@ func (fn option) apply(cfg *config) {
 	fn(cfg)
 }
 
-type config struct {
-	tracer trace.Tracer
-	meter  metric.Meter
-
-	tracerProvider    trace.TracerProvider
-	meterProvider     metric.MeterProvider
-	textMapPropagator propagation.TextMapPropagator
-
-	recordSourceOperation bool
-}
-
-func newConfig(opts []Option) *config {
-	cfg := defaultConfig()
-
-	for _, opt := range opts {
-		opt.apply(cfg)
-	}
-
-	cfg.meter = cfg.meterProvider.Meter(
-		instrumentationName,
-		metric.WithInstrumentationVersion(SemVersion()),
-	)
-
-	cfg.tracer = cfg.tracerProvider.Tracer(
-		instrumentationName,
-		trace.WithInstrumentationVersion(SemVersion()),
-	)
-
-	return cfg
-}
-
-func defaultConfig() *config {
-	return &config{
-		tracerProvider:    otel.GetTracerProvider(),
-		meterProvider:     otel.GetMeterProvider(),
-		textMapPropagator: otel.GetTextMapPropagator(),
-	}
-}
+type config = otelkitex.Config
 
 // WithRecordSourceOperation configures record source operation dimension
 func WithRecordSourceOperation(recordSourceOperation bool) Option {
-	return option(func(cfg *config) {
-		cfg.recordSourceOperation = recordSourceOperation
-	})
+	return otelkitex.WithRecordSourceOperation(recordSourceOperation)
 }
 
 // WithTextMapPropagator configures propagation
 func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
-	return option(func(cfg *config) {
-		cfg.textMapPropagator = p
-	})
+	return otelkitex.WithTextMapPropagator(p)
 }

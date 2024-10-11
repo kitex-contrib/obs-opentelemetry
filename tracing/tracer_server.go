@@ -15,104 +15,15 @@
 package tracing
 
 import (
-	"context"
-	"time"
-
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
 	"github.com/cloudwego/kitex/pkg/stats"
 	"github.com/cloudwego/kitex/server"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
-	oteltrace "go.opentelemetry.io/otel/trace"
-
-	"github.com/kitex-contrib/obs-opentelemetry/tracing/internal"
 )
 
 var _ stats.Tracer = (*serverTracer)(nil)
 
-type serverTracer struct {
-	config            *config
-	histogramRecorder map[string]metric.Float64Histogram
-}
+type serverTracer = otelkitex.KitexTracer
 
 func newServerOption(opts ...Option) (server.Option, *config) {
-	cfg := newConfig(opts)
-	st := &serverTracer{
-		config: cfg,
-	}
-
-	st.createMeasures()
-
-	return server.WithTracer(st), cfg
-}
-
-func (s *serverTracer) createMeasures() {
-	serverDurationMeasure, err := s.config.meter.Float64Histogram(ServerDuration)
-	handleErr(err)
-
-	s.histogramRecorder = map[string]metric.Float64Histogram{
-		ServerDuration: serverDurationMeasure,
-	}
-}
-
-func (s *serverTracer) Start(ctx context.Context) context.Context {
-	tc := &internal.TraceCarrier{}
-	tc.SetTracer(s.config.tracer)
-
-	return internal.WithTraceCarrier(ctx, tc)
-}
-
-func (s *serverTracer) Finish(ctx context.Context) {
-	// trace carrier from context
-	tc := internal.TraceCarrierFromContext(ctx)
-	if tc == nil {
-		return
-	}
-
-	// rpc info
-	ri := rpcinfo.GetRPCInfo(ctx)
-	if ri.Stats().Level() == stats.LevelDisabled {
-		return
-	}
-
-	st := ri.Stats()
-	rpcStart := st.GetEvent(stats.RPCStart)
-	rpcFinish := st.GetEvent(stats.RPCFinish)
-	duration := rpcFinish.Time().Sub(rpcStart.Time())
-	elapsedTime := float64(duration) / float64(time.Millisecond)
-
-	// span
-	span := tc.Span()
-	if span == nil || !span.IsRecording() {
-		return
-	}
-
-	// span attributes
-	attrs := []attribute.KeyValue{
-		RPCSystemKitex,
-		semconv.RPCMethodKey.String(ri.To().Method()),
-		semconv.RPCServiceKey.String(ri.To().ServiceName()),
-		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),
-		RPCSystemKitexSendSize.Int64(int64(st.SendSize())),
-		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
-	}
-
-	// The source operation dimension maybe cause high cardinality issues
-	if s.config.recordSourceOperation {
-		attrs = append(attrs, SourceOperationKey.String(ri.From().Method()))
-	}
-
-	span.SetAttributes(attrs...)
-
-	injectStatsEventsToSpan(span, st)
-
-	if panicMsg, panicStack, rpcErr := parseRPCError(ri); rpcErr != nil || len(panicMsg) > 0 {
-		recordErrorSpanWithStack(span, rpcErr, panicMsg, panicStack)
-	}
-
-	span.End(oteltrace.WithTimestamp(getEndTimeOrNow(ri)))
-
-	metricsAttributes := extractMetricsAttributesFromSpan(span)
-	s.histogramRecorder[ServerDuration].Record(ctx, elapsedTime, metric.WithAttributes(metricsAttributes...))
+	return otelkitex.NewServerOption(opts...)
 }

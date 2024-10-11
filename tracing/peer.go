@@ -14,14 +14,7 @@
 
 package tracing
 
-import (
-	"context"
-
-	"github.com/bytedance/gopkg/cloud/metainfo"
-	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
-)
-
+/*
 func injectPeerServiceToMetaInfo(ctx context.Context, attrs []attribute.KeyValue) map[string]string {
 	md := metainfo.GetAllValues(ctx)
 	if md == nil {
@@ -61,3 +54,4 @@ func extractPeerServiceAttributesFromMetaInfo(md map[string]string) []attribute.
 
 	return attrs
 }
+*/

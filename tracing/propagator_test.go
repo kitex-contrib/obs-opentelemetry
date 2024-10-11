@@ -16,6 +16,7 @@ package tracing
 
 import (
 	"context"
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
 	"reflect"
 	"testing"
 
@@ -50,7 +51,7 @@ func TestExtract(t *testing.T) {
 			name: "extract successful",
 			args: args{
 				ctx: ctx,
-				c:   defaultConfig(),
+				c:   otelkitex.DefaultConfig(),
 				metadata: map[string]string{
 					"foo": "bar",
 				},
@@ -73,7 +74,7 @@ func TestExtract(t *testing.T) {
 }
 
 func TestInject(t *testing.T) {
-	cfg := newConfig([]Option{WithTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+	cfg := otelkitex.NewConfig([]Option{WithTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		b3.New(),
 		ot.OT{},
 		propagation.Baggage{},
