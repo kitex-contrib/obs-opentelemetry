@@ -50,14 +50,14 @@ func (s *metadataSupplier) Keys() []string {
 }
 
 func injectMetadata(ctx context.Context, cfg *config, md metadata.MD) context.Context {
-	cfg.textMapPropagator.Inject(ctx, &metadataSupplier{
+	cfg.GetTextMapPropagator().Inject(ctx, &metadataSupplier{
 		metadata: &md,
 	})
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
 func extractMetadata(ctx context.Context, cfg *config, md metadata.MD) context.Context {
-	return cfg.textMapPropagator.Extract(ctx, &metadataSupplier{
+	return cfg.GetTextMapPropagator().Extract(ctx, &metadataSupplier{
 		metadata: &md,
 	})
 }
