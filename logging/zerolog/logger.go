@@ -16,12 +16,11 @@ package zerolog
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"os"
-
+	cwotelzero "github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelzerolog"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/rs/zerolog"
+	"io"
 )
 
 var _ klog.FullLogger = (*Logger)(nil)
@@ -34,91 +33,34 @@ const (
 )
 
 type Logger struct {
-	l      *zerolog.Logger
-	config *config
+	l cwotelzero.Logger
 }
 
 func NewLogger(opts ...Option) *Logger {
-	cfg := defaultConfig()
-
-	// apply options
-	for _, opt := range opts {
-		opt.apply(cfg)
-	}
-
-	// default logger
-	logger := zerolog.New(os.Stdout)
-	if cfg.logger != nil {
-		logger = *cfg.logger
-	}
-
-	zerologLogger := logger.Hook(cfg.defaultZerologHookFn())
-
 	return &Logger{
-		l:      &zerologLogger,
-		config: cfg,
+		l: *cwotelzero.NewLogger(opts...),
 	}
 }
 
 func (l *Logger) Logger() *zerolog.Logger {
-	return l.l
+	logger := l.l.Logger.GetLogger()
+	return &logger
 }
 
 // Log log using zerolog logger with specified level
 func (l *Logger) Log(level klog.Level, kvs ...any) {
-	switch level {
-	case klog.LevelTrace, klog.LevelDebug:
-		l.l.Debug().Msg(fmt.Sprint(kvs...))
-	case klog.LevelInfo:
-		l.l.Info().Msg(fmt.Sprint(kvs...))
-	case klog.LevelNotice, klog.LevelWarn:
-		l.l.Warn().Msg(fmt.Sprint(kvs...))
-	case klog.LevelError:
-		l.l.Error().Msg(fmt.Sprint(kvs...))
-	case klog.LevelFatal:
-		l.l.Fatal().Msg(fmt.Sprint(kvs...))
-	default:
-		l.l.Warn().Msg(fmt.Sprint(kvs...))
-	}
+	l.l.Log(levelSwitch(level), kvs...)
 }
 
 // Logf log using zerolog logger with specified level and formatting
 func (l *Logger) Logf(level klog.Level, format string, kvs ...any) {
-	switch level {
-	case klog.LevelTrace, klog.LevelDebug:
-		l.l.Debug().Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelInfo:
-		l.l.Info().Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelNotice, klog.LevelWarn:
-		l.l.Warn().Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelError:
-		l.l.Error().Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelFatal:
-		l.l.Fatal().Msg(fmt.Sprintf(format, kvs...))
-	default:
-		l.l.Warn().Msg(fmt.Sprintf(format, kvs...))
-	}
+	l.l.Logf(levelSwitch(level), format, kvs...)
 }
 
 // CtxLogf log with logger associated with context.
 // If no logger is associated, DefaultContextLogger is used, unless DefaultContextLogger is nil, in which case a disabled logger is used.
 func (l *Logger) CtxLogf(level klog.Level, ctx context.Context, format string, kvs ...any) {
-	logger := l.Logger()
-	// todo add hook
-	switch level {
-	case klog.LevelTrace, klog.LevelDebug:
-		logger.Debug().Ctx(ctx).Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelInfo:
-		logger.Info().Ctx(ctx).Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelNotice, klog.LevelWarn:
-		logger.Warn().Ctx(ctx).Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelError:
-		logger.Error().Ctx(ctx).Msg(fmt.Sprintf(format, kvs...))
-	case klog.LevelFatal:
-		logger.Fatal().Ctx(ctx).Msg(fmt.Sprintf(format, kvs...))
-	default:
-		logger.Warn().Ctx(ctx).Msg(fmt.Sprintf(format, kvs...))
-	}
+	l.l.CtxLogf(levelSwitch(level), ctx, format, kvs...)
 }
 
 // Trace logs a message at trace level.
@@ -234,26 +176,33 @@ func (l *Logger) CtxFatalf(ctx context.Context, format string, v ...any) {
 }
 
 func (l *Logger) SetLevel(level klog.Level) {
-	var lv zerolog.Level
-	switch level {
-	case klog.LevelTrace:
-		lv = zerolog.TraceLevel
-	case klog.LevelDebug:
-		lv = zerolog.DebugLevel
-	case klog.LevelInfo:
-		lv = zerolog.InfoLevel
-	case klog.LevelWarn, klog.LevelNotice:
-		lv = zerolog.WarnLevel
-	case klog.LevelError:
-		lv = zerolog.ErrorLevel
-	case klog.LevelFatal:
-		lv = zerolog.FatalLevel
-	default:
-		lv = zerolog.WarnLevel
-	}
-	l.l.Level(lv)
+	l.l.SetLevel(levelSwitch(level))
 }
 
 func (l *Logger) SetOutput(writer io.Writer) {
-	l.l.Output(writer)
+	l.l.SetOutput(writer)
+}
+
+func levelSwitch(klvel klog.Level) hlog.Level {
+	var lv hlog.Level
+	switch klvel {
+	case klog.LevelTrace:
+		lv = hlog.LevelTrace
+	case klog.LevelDebug:
+		lv = hlog.LevelDebug
+	case klog.LevelInfo:
+		lv = hlog.LevelInfo
+	case klog.LevelWarn:
+		lv = hlog.LevelWarn
+	case klog.LevelNotice:
+		lv = hlog.LevelWarn
+
+	case klog.LevelError:
+		lv = hlog.LevelError
+	case klog.LevelFatal:
+		lv = hlog.LevelFatal
+	default:
+		lv = hlog.LevelWarn
+	}
+	return lv
 }
