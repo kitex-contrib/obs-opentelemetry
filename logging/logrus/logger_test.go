@@ -56,7 +56,7 @@ func TestLogger(t *testing.T) {
 		kitexlogrus.WithRecordStackTraceInSpan(true),
 	)
 
-	logger.Logger().Info("log from origin logrus")
+	logger.Info("log from origin logrus")
 
 	klog.SetLogger(logger)
 

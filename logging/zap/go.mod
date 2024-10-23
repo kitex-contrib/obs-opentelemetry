@@ -30,3 +30,4 @@ require (
 	golang.org/x/sys v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+replace github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelzap => github.com/smx-Morgan/cwgo-pkg/telemetry/instrumentation/otelzap v0.0.0-20241019002536-84cf43046703

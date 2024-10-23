@@ -11,7 +11,6 @@ require (
 	go.opentelemetry.io/otel v1.28.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.28.0
 	go.opentelemetry.io/otel/sdk v1.28.0
-	go.opentelemetry.io/otel/trace v1.28.0
 )
 
 require (
@@ -23,9 +22,10 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	go.opentelemetry.io/otel/metric v1.28.0 // indirect
+	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 )
 
-replace (
-	github.com/cloudwego-contrib/cwgo-pkg/log/logging/zerolog => ../../../cwgo-pkg/log/logging/zerolog
-)
+replace github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelzerolog => github.com/smx-Morgan/cwgo-pkg/telemetry/instrumentation/otelzerolog v0.0.0-20241019002536-84cf43046703
+
+replace github.com/cloudwego-contrib/cwgo-pkg/log/logging/zerolog => github.com/smx-Morgan/cwgo-pkg/log/logging/zerolog v0.0.0-20241019002536-84cf43046703

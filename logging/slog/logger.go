@@ -15,7 +15,6 @@
 package slog
 
 import (
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"log/slog"
 
 	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelslog"
@@ -31,36 +30,11 @@ const (
 var _ klog.FullLogger = (*Logger)(nil)
 
 type Logger struct {
-	otelslog.Logger
+	*otelslog.KLogger
 }
 
 func NewLogger(opts ...Option) *Logger {
 	return &Logger{
-		*otelslog.NewLogger(opts...),
+		otelslog.NewKLogger(opts...),
 	}
-}
-
-func (l *Logger) SetLevel(level klog.Level) {
-	var lv hlog.Level
-	switch level {
-	case klog.LevelTrace:
-		lv = hlog.LevelTrace
-	case klog.LevelDebug:
-		lv = hlog.LevelDebug
-	case klog.LevelInfo:
-		lv = hlog.LevelInfo
-	case klog.LevelWarn:
-		lv = hlog.LevelWarn
-	case klog.LevelNotice:
-		lv = hlog.LevelWarn
-
-	case klog.LevelError:
-		lv = hlog.LevelError
-	case klog.LevelFatal:
-		lv = hlog.LevelFatal
-	default:
-		lv = hlog.LevelWarn
-	}
-	l.Logger.SetLevel(lv)
-
 }

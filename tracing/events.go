@@ -13,38 +13,3 @@
 // limitations under the License.
 
 package tracing
-
-import (
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
-	"github.com/cloudwego/kitex/pkg/stats"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-)
-
-var commonEvents = map[string]stats.Event{
-	"server_handle_start":  stats.ServerHandleStart,
-	"server_handle_finish": stats.ServerHandleFinish,
-	"client_conn_start":    stats.ClientConnStart,
-	"client_conn_finish":   stats.ClientConnFinish,
-	"read_start":           stats.ReadStart,
-	"read_finish":          stats.ReadFinish,
-	"wait_read_start":      stats.WaitReadStart,
-	"wait_read_finish":     stats.WaitReadFinish,
-	"write_start":          stats.WriteStart,
-	"write_finish":         stats.WriteFinish,
-}
-
-func injectStatsEventsToSpan(span trace.Span, st rpcinfo.RPCStats) {
-	for name, event := range commonEvents {
-		if gotEvent := st.GetEvent(event); gotEvent != nil {
-			attrs := []attribute.KeyValue{attribute.Int("event.status", int(gotEvent.Status()))}
-			if gotEvent.Info() != "" {
-				attrs = append(attrs, attribute.String("event.info", gotEvent.Info()))
-			}
-			span.AddEvent(name,
-				trace.WithTimestamp(gotEvent.Time()),
-				trace.WithAttributes(attrs...),
-			)
-		}
-	}
-}

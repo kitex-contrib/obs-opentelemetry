@@ -61,18 +61,16 @@ func WithRecordStackTraceInSpan(recordStackTraceInSpan bool) Option {
 	return otelzap.WithRecordStackTraceInSpan(recordStackTraceInSpan)
 }
 
-/*// WithExtraKeys allow you log extra values from context
+// WithExtraKeys allow you log extra values from context
 func WithExtraKeys(keys []ExtraKey) Option {
-	return otelzap.WithE
-}*/
+	return otelzap.WithExtraKeys(keys)
+}
 
 // WithExtraKeyAsStr convert extraKey to a string type when retrieving value from context
 // Not recommended for use, only for compatibility with certain situations
 //
 // For more information, refer to the documentation at
 // `https://pkg.go.dev/context#WithValue`
-/*func WithExtraKeyAsStr() Option {
-	return option(func(cfg *config) {
-		cfg.extraKeyAsStr = true
-	})
-}*/
+func WithExtraKeyAsStr() Option {
+	return otelzap.WithExtraKeyAsStr()
+}
