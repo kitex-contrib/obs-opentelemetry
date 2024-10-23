@@ -16,9 +16,6 @@ package provider
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/metric"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -84,24 +81,9 @@ func Test_newResource(t *testing.T) {
 }
 
 type config struct {
-	enableTracing bool
-	enableMetrics bool
-
-	exportInsecure bool
-	exportEndpoint string
-	exportHeaders  map[string]string
-
-	resource          *resource.Resource
-	sdkTracerProvider *sdktrace.TracerProvider
-
-	sampler sdktrace.Sampler
-
+	resource           *resource.Resource
 	resourceAttributes []attribute.KeyValue
 	resourceDetectors  []resource.Detector
-
-	textMapPropagator propagation.TextMapPropagator
-
-	meterProvider *metric.MeterProvider
 }
 
 func newResource(cfg *config) *resource.Resource {

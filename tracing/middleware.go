@@ -28,5 +28,4 @@ func ClientMiddleware(cfg *config) endpoint.Middleware {
 // ServerMiddleware extract req meta into span context
 func ServerMiddleware(cfg *config) endpoint.Middleware {
 	return otelkitex.ServerMiddleware(cfg)
-
 }

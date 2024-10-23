@@ -18,9 +18,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"strings"
 	"testing"
+
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/stretchr/testify/assert"
@@ -220,7 +221,6 @@ func TestCtxKVLogger(t *testing.T) {
 	)
 	defer func() {
 		logger.Sync()
-
 	}()
 
 	klog.SetLogger(logger)

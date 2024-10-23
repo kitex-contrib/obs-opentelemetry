@@ -16,6 +16,7 @@ package tracing
 
 import (
 	"context"
+
 	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
 
 	"go.opentelemetry.io/otel/baggage"

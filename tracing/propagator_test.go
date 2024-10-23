@@ -16,9 +16,10 @@ package tracing
 
 import (
 	"context"
-	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
 	"reflect"
 	"testing"
+
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/stretchr/testify/assert"

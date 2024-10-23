@@ -15,9 +15,10 @@
 package slog
 
 import (
-	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelslog"
 	"io"
 	"log/slog"
+
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelslog"
 )
 
 type Option = otelslog.Option
