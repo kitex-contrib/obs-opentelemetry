@@ -23,17 +23,20 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.11.2 // indirect
+	github.com/bytedance/sonic v1.12.3 // indirect
+	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/choleraehyq/pid v0.0.18 // indirect
+	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/configmanager v0.2.0 // indirect
 	github.com/cloudwego/dynamicgo v0.2.0 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.14 // indirect
 	github.com/cloudwego/hertz v0.9.2 // indirect
+	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
 	github.com/cloudwego/netpoll v0.6.0 // indirect
 	github.com/cloudwego/thriftgo v0.3.6 // indirect

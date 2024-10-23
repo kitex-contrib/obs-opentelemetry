@@ -33,6 +33,11 @@ github.com/bytedance/sonic v1.10.0-rc/go.mod h1:ElCzW+ufi8qKqNW0FY314xriJhyJhuoJ
 github.com/bytedance/sonic v1.10.2/go.mod h1:iZcSUejdk5aukTND/Eu/ivjQuEL0Cu9/rf50Hi0u/g4=
 github.com/bytedance/sonic v1.11.2 h1:ywfwo0a/3j9HR8wsYGWsIWl2mvRsI950HyoxiBERw5A=
 github.com/bytedance/sonic v1.11.2/go.mod h1:iZcSUejdk5aukTND/Eu/ivjQuEL0Cu9/rf50Hi0u/g4=
+github.com/bytedance/sonic v1.12.3 h1:W2MGa7RCU1QTeYRTPE3+88mVC0yXmsRQRChiyVocVjU=
+github.com/bytedance/sonic v1.12.3/go.mod h1:B8Gt/XvtZ3Fqj+iSKMypzymZxw/FVwgIGKzMzT9r/rk=
+github.com/bytedance/sonic/loader v0.1.1/go.mod h1:ncP89zfokxS5LZrJxl5z0UJcsk4M4yY2JpfqGeCtNLU=
+github.com/bytedance/sonic/loader v0.2.0 h1:zNprn+lsIP06C/IqCHs3gPQIvnvpKbbxyXQP1iU4kWM=
+github.com/bytedance/sonic/loader v0.2.0/go.mod h1:ncP89zfokxS5LZrJxl5z0UJcsk4M4yY2JpfqGeCtNLU=
 github.com/cenkalti/backoff/v4 v4.2.1 h1:y4OZtCnogmCPw98Zjyt5a6+QwPLGkiQsYW5oUqylYbM=
 github.com/cenkalti/backoff/v4 v4.2.1/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
@@ -58,6 +63,8 @@ github.com/chzyer/test v0.0.0-20210722231415-061457976a23/go.mod h1:Q3SI9o4m/ZMn
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cloudwego-contrib/cwgo-pkg/telemetry v0.0.0-20241014044734-80a98dbe0b6a h1:jB0AG6R9hB/UB7m13a8PJyINrO/Q/CvujvGbUNks48I=
 github.com/cloudwego-contrib/cwgo-pkg/telemetry v0.0.0-20241014044734-80a98dbe0b6a/go.mod h1:xnZ0Px0hRRTDNO5KaicZtGIkza32DBpFglJty79yLzI=
+github.com/cloudwego/base64x v0.1.4 h1:jwCgWpFanWmN8xoIUHa2rtzmkd5J2plF/dnLS6Xd/0Y=
+github.com/cloudwego/base64x v0.1.4/go.mod h1:0zlkT4Wn5C6NdauXdJRhSKRlJvmclQ1hhJgA0rcu/8w=
 github.com/cloudwego/configmanager v0.2.0 h1:niVpVg+wQ+npNqnH3dup96SMbR02Pk+tNErubYCJqKo=
 github.com/cloudwego/configmanager v0.2.0/go.mod h1:FLIQTjxsZRGjnmDhTttWQTy6f6DghPTatfBVOs2gQLk=
 github.com/cloudwego/dynamicgo v0.1.0/go.mod h1:Mdsz0XGsIImi15vxhZaHZpspNChEmBMIiWkUfD6JDKg=
@@ -72,6 +79,8 @@ github.com/cloudwego/frugal v0.1.14 h1:vkjQMb5OsPL779RfMdLI4YJZsOH8fR0ewJpTuAVSe
 github.com/cloudwego/frugal v0.1.14/go.mod h1:zFBA63ne4+Tz4qayRZFZf+ZVwGqTzb+1Xe3ZDCq+Wfc=
 github.com/cloudwego/hertz v0.9.2 h1:VbqddZ5RuvcgxzfxvXcmTiRisGYoo0+WnHGeDJKhjqI=
 github.com/cloudwego/hertz v0.9.2/go.mod h1:cs8dH6unM4oaJ5k9m6pqbgLBPqakGWMG0+cthsxitsg=
+github.com/cloudwego/iasm v0.2.0 h1:1KNIy1I1H9hNNFEEH3DVnI4UujN+1zjpuk6gwHLTssg=
+github.com/cloudwego/iasm v0.2.0/go.mod h1:8rXZaNYT2n95jn+zTI1sDr+IgcD2GVs0nlbbQPiEFhY=
 github.com/cloudwego/kitex v0.3.2/go.mod h1:/XD07VpUD9VQWmmoepASgZ6iw//vgWikVA9MpzLC5i0=
 github.com/cloudwego/kitex v0.4.4/go.mod h1:3FcH5h9Qw+dhRljSzuGSpWuThttA8DvK0BsL7HUYydo=
 github.com/cloudwego/kitex v0.6.1/go.mod h1:zI1GBrjT0qloTikcCfQTgxg3Ws+yQMyaChEEOcGNUvA=
