@@ -20,13 +20,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/README.md#json-formats
-const (
-	traceIDKey    = "trace_id"
-	spanIDKey     = "span_id"
-	traceFlagsKey = "trace_flags"
-)
-
 var _ logrus.Hook = (*TraceHook)(nil)
 
 type TraceHookConfig = otellogrus.TraceHookConfig
