@@ -19,18 +19,8 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 )
 
-const (
-	instrumentationName = "github.com/kitex-contrib/obs-opentelemetry"
-)
-
 // Option opts for opentelemetry tracer provider
 type Option = otelkitex.Option
-
-type option func(cfg *config)
-
-func (fn option) apply(cfg *config) {
-	fn(cfg)
-}
 
 type config = otelkitex.Config
 
