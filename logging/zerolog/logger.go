@@ -22,13 +22,6 @@ import (
 
 var _ klog.FullLogger = (*Logger)(nil)
 
-// Ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/README.md#json-formats
-const (
-	traceIDKey    = "trace_id"
-	spanIDKey     = "span_id"
-	traceFlagsKey = "trace_flags"
-)
-
 type Logger struct {
 	cwotelzero.KLogger
 }

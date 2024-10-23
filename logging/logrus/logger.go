@@ -26,7 +26,6 @@ type Logger struct {
 }
 
 func NewLogger(opts ...Option) *Logger {
-
 	return &Logger{
 		otellogrus.NewKLogger(opts...),
 	}
