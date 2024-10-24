@@ -143,5 +143,4 @@ func TestLogOption(t *testing.T) {
 
 	logger.Debug("this is a debug log")
 	assert.True(t, strings.Contains(buf.String(), "this is a debug new log"))
-
 }
