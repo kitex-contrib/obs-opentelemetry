@@ -9,7 +9,6 @@ require (
 	go.opentelemetry.io/otel v1.28.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.28.0
 	go.opentelemetry.io/otel/sdk v1.28.0
-	go.opentelemetry.io/otel/trace v1.28.0
 )
 
 require (
@@ -22,8 +21,9 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.opentelemetry.io/otel/metric v1.28.0 // indirect
+	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelslog => github.com/smx-Morgan/cwgo-pkg/telemetry/instrumentation/otelslog v0.0.0-20241019002536-84cf43046703
+replace github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelslog => github.com/smx-Morgan/cwgo-pkg/telemetry/instrumentation/otelslog v0.0.0-20241025113151-bb9e8e3bb3be
