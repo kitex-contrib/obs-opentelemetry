@@ -20,12 +20,6 @@ import (
 	"log/slog"
 )
 
-const (
-	traceIDKey    = "trace_id"
-	spanIDKey     = "span_id"
-	traceFlagsKey = "trace_flags"
-)
-
 type traceConfig = otelslog.TraceConfig
 
 type traceHandler = otelslog.TraceHandler
