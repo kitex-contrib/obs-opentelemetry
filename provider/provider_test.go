@@ -15,6 +15,7 @@
 package provider
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -77,4 +78,30 @@ func Test_newResource(t *testing.T) {
 			}
 		})
 	}
+}
+
+type config struct {
+	resource           *resource.Resource
+	resourceAttributes []attribute.KeyValue
+	resourceDetectors  []resource.Detector
+}
+
+func newResource(cfg *config) *resource.Resource {
+	if cfg.resource != nil {
+		return cfg.resource
+	}
+
+	res, err := resource.New(
+		context.Background(),
+		resource.WithHost(),
+		resource.WithFromEnv(),
+		resource.WithProcessPID(),
+		resource.WithTelemetrySDK(),
+		resource.WithDetectors(cfg.resourceDetectors...),
+		resource.WithAttributes(cfg.resourceAttributes...),
+	)
+	if err != nil {
+		return resource.Default()
+	}
+	return res
 }

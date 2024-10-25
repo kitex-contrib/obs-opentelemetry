@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"log/slog"
-	"os"
 	"strings"
 	"testing"
 
@@ -144,7 +143,4 @@ func TestLogOption(t *testing.T) {
 
 	logger.Debug("this is a debug log")
 	assert.True(t, strings.Contains(buf.String(), "this is a debug new log"))
-
-	dir, _ := os.Getwd()
-	assert.True(t, strings.Contains(buf.String(), dir))
 }

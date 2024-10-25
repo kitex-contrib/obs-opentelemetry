@@ -15,30 +15,9 @@
 package slog
 
 import (
-	"fmt"
 	"log/slog"
 	"strings"
-
-	"github.com/cloudwego/kitex/pkg/klog"
 )
-
-// get format msg
-func getMessage(template string, fmtArgs []interface{}) string {
-	if len(fmtArgs) == 0 {
-		return template
-	}
-
-	if template != "" {
-		return fmt.Sprintf(template, fmtArgs...)
-	}
-
-	if len(fmtArgs) == 1 {
-		if str, ok := fmtArgs[0].(string); ok {
-			return str
-		}
-	}
-	return fmt.Sprint(fmtArgs...)
-}
 
 // OtelSeverityText convert slog level to otel severityText
 // ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#severity-fields
@@ -48,27 +27,4 @@ func OtelSeverityText(lv slog.Level) string {
 		s = "warn"
 	}
 	return strings.ToUpper(s)
-}
-
-// Adapt klog level to slog level
-func tranSLevel(level klog.Level) (lvl slog.Level) {
-	switch level {
-	case klog.LevelTrace:
-		lvl = LevelTrace
-	case klog.LevelDebug:
-		lvl = slog.LevelDebug
-	case klog.LevelInfo:
-		lvl = slog.LevelInfo
-	case klog.LevelWarn:
-		lvl = slog.LevelWarn
-	case klog.LevelNotice:
-		lvl = LevelNotice
-	case klog.LevelError:
-		lvl = slog.LevelError
-	case klog.LevelFatal:
-		lvl = LevelFatal
-	default:
-		lvl = slog.LevelWarn
-	}
-	return
 }

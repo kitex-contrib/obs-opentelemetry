@@ -15,17 +15,12 @@
 package zerolog
 
 import (
-	"strings"
-
+	cwotelzero "github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelzerolog"
 	"github.com/rs/zerolog"
 )
 
 // OtelSeverityText convert zerolog level to otel severityText
 // ref to https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#severity-fields
 func OtelSeverityText(lv zerolog.Level) string {
-	s := strings.ToUpper(lv.String())
-	if s == "PANIC" {
-		s = "FATAL"
-	}
-	return s
+	return cwotelzero.OtelSeverityText(lv)
 }

@@ -15,75 +15,32 @@
 package logrus
 
 import (
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otellogrus"
 	"github.com/sirupsen/logrus"
 )
 
-type Option interface {
-	apply(cfg *config)
-}
-
-type option func(cfg *config)
-
-func (fn option) apply(cfg *config) {
-	fn(cfg)
-}
-
-type config struct {
-	logger *logrus.Logger
-	hooks  []logrus.Hook
-
-	traceHookConfig *TraceHookConfig
-}
-
-func defaultConfig() *config {
-	// new logger
-	logger := logrus.New()
-	// default json format
-	logger.SetFormatter(new(logrus.JSONFormatter))
-
-	return &config{
-		logger: logger,
-		hooks:  []logrus.Hook{},
-		traceHookConfig: &TraceHookConfig{
-			recordStackTraceInSpan: true,
-			enableLevels:           logrus.AllLevels,
-			errorSpanLevel:         logrus.ErrorLevel,
-		},
-	}
-}
+type Option = otellogrus.Option
 
 func WithLogger(logger *logrus.Logger) Option {
-	return option(func(cfg *config) {
-		cfg.logger = logger
-	})
+	return otellogrus.WithLogger(logger)
 }
 
 func WithHook(hook logrus.Hook) Option {
-	return option(func(cfg *config) {
-		cfg.hooks = append(cfg.hooks, hook)
-	})
+	return otellogrus.WithHook(hook)
 }
 
 func WithTraceHookConfig(hookConfig *TraceHookConfig) Option {
-	return option(func(cfg *config) {
-		cfg.traceHookConfig = hookConfig
-	})
+	return otellogrus.WithTraceHookConfig(hookConfig)
 }
 
 func WithTraceHookLevels(levels []logrus.Level) Option {
-	return option(func(cfg *config) {
-		cfg.traceHookConfig.enableLevels = levels
-	})
+	return otellogrus.WithTraceHookLevels(levels)
 }
 
 func WithTraceHookErrorSpanLevel(level logrus.Level) Option {
-	return option(func(cfg *config) {
-		cfg.traceHookConfig.errorSpanLevel = level
-	})
+	return otellogrus.WithTraceHookErrorSpanLevel(level)
 }
 
 func WithRecordStackTraceInSpan(recordStackTraceInSpan bool) Option {
-	return option(func(cfg *config) {
-		cfg.traceHookConfig.recordStackTraceInSpan = recordStackTraceInSpan
-	})
+	return otellogrus.WithRecordStackTraceInSpan(recordStackTraceInSpan)
 }

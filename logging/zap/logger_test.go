@@ -21,6 +21,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel"
@@ -90,10 +92,7 @@ func TestLogger(t *testing.T) {
 		WithRecordStackTraceInSpan(true),
 	)
 	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			return
-		}
+		logger.Sync()
 	}()
 
 	klog.SetLogger(logger)
@@ -145,10 +144,7 @@ func TestLogLevel(t *testing.T) {
 		WithRecordStackTraceInSpan(true),
 	)
 	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			return
-		}
+		logger.Sync()
 	}()
 
 	// output to buffer
@@ -173,10 +169,7 @@ func TestCoreOption(t *testing.T) {
 		WithCoreWs(zapcore.AddSync(buf)),
 	)
 	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			return
-		}
+		logger.Sync()
 	}()
 
 	logger.SetOutput(buf)
@@ -200,10 +193,7 @@ func TestZapOption(t *testing.T) {
 		WithZapOptions(zap.AddCaller()),
 	)
 	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			return
-		}
+		logger.Sync()
 	}()
 
 	logger.SetOutput(buf)
@@ -230,10 +220,7 @@ func TestCtxKVLogger(t *testing.T) {
 		WithRecordStackTraceInSpan(true),
 	)
 	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			return
-		}
+		logger.Sync()
 	}()
 
 	klog.SetLogger(logger)
@@ -249,7 +236,7 @@ func TestCtxKVLogger(t *testing.T) {
 		klog.LevelError,
 		// klog.LevelFatal,
 	} {
-		logger.CtxLogf(level, context.Background(), "log from origin zap %s=%s", "k1", "v1")
+		logger.CtxLogf(Leveltrans(level), context.Background(), "log from origin zap %s=%s", "k1", "v1")
 		println(buf.String())
 		assert.True(t, strings.Contains(buf.String(), "log from origin zap"))
 		assert.True(t, strings.Contains(buf.String(), "k1"))
@@ -410,4 +397,27 @@ func TestExtraKeyAsStr(t *testing.T) {
 	assert.Contains(t, buf.String(), v)
 
 	buf.Reset()
+}
+
+func Leveltrans(level klog.Level) hlog.Level {
+	var lv hlog.Level
+	switch level {
+	case klog.LevelTrace:
+		lv = hlog.LevelTrace
+	case klog.LevelDebug:
+		lv = hlog.LevelDebug
+	case klog.LevelInfo:
+		lv = hlog.LevelInfo
+	case klog.LevelWarn:
+		lv = hlog.LevelWarn
+	case klog.LevelNotice:
+		lv = hlog.LevelNotice
+	case klog.LevelError:
+		lv = hlog.LevelError
+	case klog.LevelFatal:
+		lv = hlog.LevelFatal
+	default:
+		lv = hlog.LevelWarn
+	}
+	return lv
 }

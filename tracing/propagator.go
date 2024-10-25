@@ -17,8 +17,8 @@ package tracing
 import (
 	"context"
 
-	"github.com/bytedance/gopkg/cloud/metainfo"
-	"go.opentelemetry.io/otel"
+	"github.com/cloudwego-contrib/cwgo-pkg/telemetry/instrumentation/otelkitex"
+
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -54,31 +54,22 @@ func (m *metadataProvider) Keys() []string {
 
 // Inject injects span context into the kitex metadata info
 func Inject(ctx context.Context, c *config, metadata map[string]string) {
-	c.textMapPropagator.Inject(ctx, &metadataProvider{metadata: metadata})
+	c.GetTextMapPropagator().Inject(ctx, &metadataProvider{metadata: metadata})
 }
 
 // Extract returns the baggage and span context
 func Extract(ctx context.Context, c *config, metadata map[string]string) (baggage.Baggage, trace.SpanContext) {
-	ctx = c.textMapPropagator.Extract(ctx, &metadataProvider{metadata: CGIVariableToHTTPHeaderMetadata(metadata)})
+	ctx = c.GetTextMapPropagator().Extract(ctx, &metadataProvider{metadata: CGIVariableToHTTPHeaderMetadata(metadata)})
 	return baggage.FromContext(ctx), trace.SpanContextFromContext(ctx)
 }
 
 // CGIVariableToHTTPHeaderMetadata converts all CGI variable into HTTP header key.
 // For example, `ABC_DEF` will be converted to `abc-def`.
 func CGIVariableToHTTPHeaderMetadata(metadata map[string]string) map[string]string {
-	res := make(map[string]string, len(metadata))
-	for k, v := range metadata {
-		res[metainfo.CGIVariableToHTTPHeader(k)] = v
-	}
-	return res
+	return otelkitex.CGIVariableToHTTPHeaderMetadata(metadata)
 }
 
 // ExtractFromPropagator get metadata from propagator
 func ExtractFromPropagator(ctx context.Context) map[string]string {
-	metadata := metainfo.GetAllValues(ctx)
-	if metadata == nil {
-		metadata = make(map[string]string)
-	}
-	otel.GetTextMapPropagator().Inject(ctx, &metadataProvider{metadata: metadata})
-	return metadata
+	return otelkitex.ExtractFromPropagator(ctx)
 }
