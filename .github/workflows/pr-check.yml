@@ -28,7 +28,7 @@ jobs:
         with:
           version: latest
           working-directory: ${{ matrix.workdir }}
-          args: -E gofumpt --timeout 5m --go 1.21
+          args: -E gofumpt --timeout 5m --go 1.23
           skip-pkg-cache: true
 
   compliant-test:
@@ -37,11 +37,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
