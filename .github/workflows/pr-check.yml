@@ -1,6 +1,6 @@
 name: Pull Request Check
 
-on: pull_request
+on: [ pull_request ]
 
 jobs:
   resolve-modules:
@@ -31,7 +31,7 @@ jobs:
           args: -E gofumpt --timeout 5m --go 1.21
           skip-pkg-cache: true
 
-  build:
+  compliant-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.21
+          go-version: stable
 
       - uses: actions/cache@v3
         with:
@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Check License Header
-        uses: apache/skywalking-eyes@da0aa5d51adacfcb7d00cf2749246353a62501e4
+        uses: apache/skywalking-eyes/header@v0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
