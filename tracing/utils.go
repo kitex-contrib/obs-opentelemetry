@@ -20,7 +20,9 @@ import (
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/serviceinfo"
 	"github.com/cloudwego/kitex/pkg/stats"
+	"github.com/cloudwego/kitex/transport"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -106,4 +108,38 @@ func getServiceFromResourceAttributes(attrs []attribute.KeyValue) (serviceName, 
 		}
 	}
 	return
+}
+
+func getStreamingProtocol(trans transport.Protocol) string {
+	switch {
+	case trans&transport.GRPC != 0:
+		return transport.GRPC.String()
+	case trans&transport.TTHeaderStreaming != 0:
+		return transport.TTHeaderStreaming.String()
+	default:
+		return ""
+	}
+}
+
+func getStreamingMode(ri rpcinfo.RPCInfo) string {
+	trans := ri.Config().TransportProtocol()
+	// streaming_mode
+	mode := ri.Invocation().StreamingMode()
+	switch mode {
+	case serviceinfo.StreamingUnary:
+		return "unary"
+	case serviceinfo.StreamingClient:
+		return "client"
+	case serviceinfo.StreamingServer:
+		return "server"
+	case serviceinfo.StreamingBidirectional:
+		return "bidirectional"
+	case serviceinfo.StreamingNone:
+		// When using StreamX and specifying WithTransportProtocol(GRPC), calling Ping-Pong interface would result in gRPC unary.
+		// Since StreamingMode is not specified in generated code, StreamingNone will be obtained here.
+		if trans == transport.GRPC {
+			return "unary"
+		}
+	}
+	return ""
 }

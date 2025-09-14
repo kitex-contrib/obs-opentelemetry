@@ -21,6 +21,7 @@ import (
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/stats"
+	"github.com/cloudwego/kitex/transport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
@@ -87,8 +88,26 @@ func (c *clientTracer) Finish(ctx context.Context) {
 		semconv.RPCServiceKey.String(ri.To().ServiceName()),
 		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),
 		RPCSystemKitexSendSize.Int64(int64(st.SendSize())),
-		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
 	}
+
+	trans := ri.Config().TransportProtocol()
+	protocol := trans.String()
+	stCfg := c.config.streamingConfig
+	// in client-side, a kitex client supports both Ping-Pong and streaming so we have to distinguish
+	// using client.Stream/client.StreamX interface or client.Call with gRPC unary
+	if ri.Config().InteractionMode() == rpcinfo.Streaming || trans == transport.GRPC {
+		if stCfg != nil {
+			if stProt := getStreamingProtocol(trans); stProt != "" {
+				protocol = stProt
+			}
+			if stCfg.streamingSpanMode {
+				if modeStr := getStreamingMode(ri); modeStr != "" {
+					attrs = append(attrs, StreamingModeKey.String(modeStr))
+				}
+			}
+		}
+	}
+	attrs = append(attrs, RequestProtocolKey.String(protocol))
 
 	// The source operation dimension maybe cause high cardinality issues
 	if c.config.recordSourceOperation {

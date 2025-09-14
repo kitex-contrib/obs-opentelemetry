@@ -30,6 +30,16 @@ const (
 	// db: mysql, postgresql
 	// mq: 'rabbitmq', 'activemq', 'AmazonSQS'
 	RequestProtocolKey = attribute.Key("request.protocol")
+
+	// StreamingModeKey mode of streaming interface
+	//
+	// Type: string
+	// Examples:
+	// unary
+	// client
+	// server
+	// bidirectional
+	StreamingModeKey = attribute.Key("streaming.mode")
 )
 
 const (

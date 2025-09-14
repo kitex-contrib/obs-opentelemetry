@@ -19,6 +19,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/serviceinfo"
+	"github.com/cloudwego/kitex/transport"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -121,5 +124,107 @@ func Test_recordErrorSpan(t *testing.T) {
 				assert.Equal(t, tt.wantEventAttributesLen, len(event.Attributes))
 			}
 		})
+	}
+}
+
+func Test_getStreamingProtocol(t *testing.T) {
+	tests := []struct {
+		trans  transport.Protocol
+		expect string
+	}{
+		{
+			trans:  transport.GRPC,
+			expect: transport.GRPC.String(),
+		},
+		{
+			trans:  transport.TTHeaderFramed | transport.TTHeaderStreaming,
+			expect: transport.TTHeaderStreaming.String(),
+		},
+		{
+			trans:  transport.Framed,
+			expect: "",
+		},
+	}
+
+	for _, tt := range tests {
+		res := getStreamingProtocol(tt.trans)
+		assert.Equal(t, tt.expect, res)
+	}
+}
+
+func Test_getStreamingMode(t *testing.T) {
+	tests := []struct {
+		riFunc func() rpcinfo.RPCInfo
+		expect string
+	}{
+		{
+			riFunc: func() rpcinfo.RPCInfo {
+				ink := rpcinfo.NewInvocation("", "")
+				ink.SetStreamingMode(serviceinfo.StreamingUnary)
+				cfg := rpcinfo.NewRPCConfig()
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.PurePayload)
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.GRPC)
+				return rpcinfo.NewRPCInfo(nil, nil, ink, cfg, nil)
+			},
+			expect: "unary",
+		},
+		{
+			riFunc: func() rpcinfo.RPCInfo {
+				ink := rpcinfo.NewInvocation("", "")
+				ink.SetStreamingMode(serviceinfo.StreamingClient)
+				cfg := rpcinfo.NewRPCConfig()
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.PurePayload)
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.GRPC)
+				return rpcinfo.NewRPCInfo(nil, nil, ink, cfg, nil)
+			},
+			expect: "client",
+		},
+		{
+			riFunc: func() rpcinfo.RPCInfo {
+				ink := rpcinfo.NewInvocation("", "")
+				ink.SetStreamingMode(serviceinfo.StreamingServer)
+				cfg := rpcinfo.NewRPCConfig()
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.PurePayload)
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.GRPC)
+				return rpcinfo.NewRPCInfo(nil, nil, ink, cfg, nil)
+			},
+			expect: "server",
+		},
+		{
+			riFunc: func() rpcinfo.RPCInfo {
+				ink := rpcinfo.NewInvocation("", "")
+				ink.SetStreamingMode(serviceinfo.StreamingBidirectional)
+				cfg := rpcinfo.NewRPCConfig()
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.PurePayload)
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.GRPC)
+				return rpcinfo.NewRPCInfo(nil, nil, ink, cfg, nil)
+			},
+			expect: "bidirectional",
+		},
+		{
+			riFunc: func() rpcinfo.RPCInfo {
+				ink := rpcinfo.NewInvocation("", "")
+				cfg := rpcinfo.NewRPCConfig()
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.PurePayload)
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.GRPC)
+				return rpcinfo.NewRPCInfo(nil, nil, ink, cfg, nil)
+			},
+			expect: "unary",
+		},
+		{
+			riFunc: func() rpcinfo.RPCInfo {
+				ink := rpcinfo.NewInvocation("", "")
+				cfg := rpcinfo.NewRPCConfig()
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.PurePayload)
+				_ = rpcinfo.AsMutableRPCConfig(cfg).SetTransportProtocol(transport.TTHeaderFramed)
+				return rpcinfo.NewRPCInfo(nil, nil, ink, cfg, nil)
+			},
+			expect: "",
+		},
+	}
+
+	for _, tt := range tests {
+		res := getStreamingMode(tt.riFunc())
+		assert.Equal(t, tt.expect, res)
 	}
 }
