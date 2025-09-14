@@ -58,7 +58,10 @@ var (
 		PeerDeploymentEnvironmentKey,
 		RequestProtocolKey,
 		SourceOperationKey,
+		StreamingModeAttribute,
 	}
+
+	StreamingModeAttribute = attribute.Key("streaming.mode")
 
 	// MetricResourceAttributes resource attributes
 	MetricResourceAttributes = []attribute.Key{

@@ -46,6 +46,8 @@ type config struct {
 
 	recordSourceOperation bool
 	enableGRPCMetadata    bool
+
+	streamingConfig *streamingConfig
 }
 
 func newConfig(opts []Option) *config {
@@ -76,6 +78,43 @@ func defaultConfig() *config {
 	}
 }
 
+type streamingConfig struct {
+	streamingSpanMode    bool
+	streamingMetricsMode bool
+}
+
+func defaultStreamingConfig() *streamingConfig {
+	return &streamingConfig{
+		streamingSpanMode:    true,
+		streamingMetricsMode: true,
+	}
+}
+
+// StreamingOption opts for opentelemetry tracer provider
+type StreamingOption interface {
+	apply(cfg *streamingConfig)
+}
+
+type streamingOption func(cfg *streamingConfig)
+
+func (fn streamingOption) apply(cfg *streamingConfig) {
+	fn(cfg)
+}
+
+// WithStreamingSpanMode enables adding streaming.mode tag in span
+func WithStreamingSpanMode(enabled bool) StreamingOption {
+	return streamingOption(func(cfg *streamingConfig) {
+		cfg.streamingSpanMode = enabled
+	})
+}
+
+// WithStreamingMetricsMode enables adding streaming.mode tag in peer metrics
+func WithStreamingMetricsMode(enabled bool) StreamingOption {
+	return streamingOption(func(cfg *streamingConfig) {
+		cfg.streamingMetricsMode = enabled
+	})
+}
+
 // WithRecordSourceOperation configures record source operation dimension
 func WithRecordSourceOperation(recordSourceOperation bool) Option {
 	return option(func(cfg *config) {
@@ -94,5 +133,19 @@ func WithTextMapPropagator(p propagation.TextMapPropagator) Option {
 func WithEnableGRPCMetadata() Option {
 	return option(func(cfg *config) {
 		cfg.enableGRPCMetadata = true
+	})
+}
+
+// WithDetailedStreamingStats enables detailed streaming observability
+func WithDetailedStreamingStats(opts ...StreamingOption) Option {
+	return option(func(cfg *config) {
+		if cfg.streamingConfig == nil {
+			cfg.streamingConfig = defaultStreamingConfig()
+		}
+		if cfg.streamingConfig != nil {
+			for _, opt := range opts {
+				opt.apply(cfg.streamingConfig)
+			}
+		}
 	})
 }

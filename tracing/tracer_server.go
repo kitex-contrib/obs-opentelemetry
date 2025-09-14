@@ -95,7 +95,14 @@ func (s *serverTracer) Finish(ctx context.Context) {
 		semconv.RPCServiceKey.String(ri.To().ServiceName()),
 		RPCSystemKitexRecvSize.Int64(int64(st.RecvSize())),
 		RPCSystemKitexSendSize.Int64(int64(st.SendSize())),
+		// in server-side, the transport protocol is determined
 		RequestProtocolKey.String(ri.Config().TransportProtocol().String()),
+	}
+
+	if s.config.streamingConfig != nil && s.config.streamingConfig.streamingSpanMode {
+		if modeStr := getStreamingMode(ri); modeStr != "" {
+			attrs = append(attrs, StreamingModeKey.String(modeStr))
+		}
 	}
 
 	// The source operation dimension maybe cause high cardinality issues
