@@ -3,7 +3,7 @@ module github.com/kitex-contrib/obs-opentelemetry
 go 1.23.0
 
 require (
-	github.com/bytedance/gopkg v0.1.1
+	github.com/bytedance/gopkg v0.1.3
 	github.com/cloudwego/kitex v0.11.3
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.62.0
@@ -21,10 +21,10 @@ require (
 
 require (
 	github.com/apache/thrift v0.16.0 // indirect
-	github.com/bytedance/sonic v1.12.2 // indirect
-	github.com/bytedance/sonic/loader v0.2.0 // indirect
+	github.com/bytedance/sonic v1.14.2 // indirect
+	github.com/bytedance/sonic/loader v0.4.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/cloudwego/base64x v0.1.4 // indirect
+	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/cloudwego/configmanager v0.2.2 // indirect
 	github.com/cloudwego/dynamicgo v0.4.0 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
@@ -46,7 +46,7 @@ require (
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/gls v0.0.0-20220109145502-612d0167dce5 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
